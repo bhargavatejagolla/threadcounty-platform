@@ -62,9 +62,9 @@ export default function PDFExportPage({ params }: { params: { id: string } }) {
         <p className="text-zinc-500 font-medium tracking-widest uppercase text-xl mb-12">Enterprise Quality Inspection Report</p>
         
         <div className="bg-zinc-50 border border-zinc-200 p-8 rounded-xl w-full max-w-lg mb-12">
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Material Certification</p>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Estimated Material Category</p>
           <p className="text-4xl font-bold text-indigo-900 mb-2">{inspection.material_prediction || 'Unknown'}</p>
-          <p className="text-lg text-indigo-600 font-medium">Pattern: {inspection.pattern_prediction || 'Plain'}</p>
+          <p className="text-lg text-indigo-600 font-medium">Likely Pattern: {inspection.pattern_prediction || 'Plain'}</p>
         </div>
 
         <div className="mt-auto flex justify-between w-full text-left">

@@ -377,11 +377,11 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
             <motion.div variants={fadeUp}>
               <Card className="bg-zinc-950/50 border-white/10 text-center hover:bg-zinc-900/50 transition-colors h-full flex flex-col justify-center">
                 <CardContent className="p-6">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Predicted Material</p>
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Estimated Material Category</p>
                   <div className="text-2xl font-bold text-white tracking-tight flex items-baseline justify-center gap-1">
                     {inspection.material_prediction || 'Unknown'}
                   </div>
-                  <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-2">Pattern: {inspection.pattern_prediction || 'Plain'}</p>
+                  <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-2">Likely Pattern: {inspection.pattern_prediction || 'Plain'}</p>
                 </CardContent>
               </Card>
             </motion.div>
