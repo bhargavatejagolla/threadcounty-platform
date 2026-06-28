@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
+    config.infrastructureLogging = {
+      level: 'error',
+    };
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
