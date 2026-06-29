@@ -73,11 +73,11 @@
   }
   
   /* Global Hover Glow for all Cards */
-  .bg-zinc-950\\/50, .bg-card, .bg-zinc-900\\/50 {
+  .glass, .bg-card, [class*="bg-zinc-9"] {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   
-  .bg-zinc-950\\/50:hover, .bg-card:hover, .bg-zinc-900\\/50:hover {
+  .glass:hover, .bg-card:hover, [class*="bg-zinc-9"]:hover {
     box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), inset 0 0 20px rgba(99, 102, 241, 0.05);
     border-color: rgba(99, 102, 241, 0.3);
     transform: translateY(-2px);
