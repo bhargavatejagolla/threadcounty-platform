@@ -13,9 +13,11 @@
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?style=for-the-badge&logo=three.js)](https://threejs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth_&_DB-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
 
-[Explore the Dashboard](#) · [View Demo](#) · [Report Bug](#) · [Request Feature](#)
+[🔴 **Live Production Deployment**](https://threadcounty-platform-p3yi.vercel.app) · [Report Bug](#) · [Request Feature](#)
 
 ---
+
+### 🚀 **[Experience NovaWeave AI Live ➔](https://threadcounty-platform-p3yi.vercel.app)** 🚀
 
 </div>
 
