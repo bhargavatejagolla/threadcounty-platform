@@ -12,22 +12,25 @@ export class OpenCVClassifier implements ClassifierPlugin {
 
   async classify(features: FeatureVector): Promise<ClassificationResult> {
     
-    // Idealized Feature Profiles (Centroids in Feature Space)
+    // Idealized Feature Profiles (Centroids in Feature Space based on physical textile science)
+    // - Wool is fuzzy: high entropy, LOW edge density, high variance.
+    // - Linen is coarse/crisp: high entropy, HIGH edge density, low correlation.
+    // - Silk is smooth: low entropy, almost no edges, high homogeneity.
     const materials = [
-      { name: 'Cotton', profile: { entropy: 5.5, homogeneity: 0.7, energy: 0.4, contrast: 15, correlation: 0.6, edge_density: 10, texture_variance: 80 } },
-      { name: 'Linen', profile: { entropy: 6.8, homogeneity: 0.4, energy: 0.2, contrast: 25, correlation: 0.3, edge_density: 18, texture_variance: 150 } },
+      { name: 'Cotton', profile: { entropy: 5.5, homogeneity: 0.6, energy: 0.4, contrast: 15, correlation: 0.6, edge_density: 15, texture_variance: 80 } },
+      { name: 'Linen', profile: { entropy: 7.0, homogeneity: 0.3, energy: 0.15, contrast: 35, correlation: 0.2, edge_density: 30, texture_variance: 140 } },
       { name: 'Silk', profile: { entropy: 3.5, homogeneity: 0.9, energy: 0.8, contrast: 5, correlation: 0.9, edge_density: 3, texture_variance: 20 } },
-      { name: 'Wool', profile: { entropy: 7.2, homogeneity: 0.3, energy: 0.1, contrast: 30, correlation: 0.4, edge_density: 22, texture_variance: 180 } },
-      { name: 'Polyester', profile: { entropy: 4.5, homogeneity: 0.8, energy: 0.6, contrast: 10, correlation: 0.8, edge_density: 6, texture_variance: 40 } },
-      { name: 'Denim', profile: { entropy: 6.5, homogeneity: 0.5, energy: 0.3, contrast: 35, correlation: 0.6, edge_density: 25, texture_variance: 200 } },
-      { name: 'Rayon', profile: { entropy: 4.8, homogeneity: 0.8, energy: 0.5, contrast: 8, correlation: 0.7, edge_density: 7, texture_variance: 50 } },
+      { name: 'Wool', profile: { entropy: 7.5, homogeneity: 0.2, energy: 0.1, contrast: 20, correlation: 0.4, edge_density: 10, texture_variance: 180 } },
+      { name: 'Polyester', profile: { entropy: 4.5, homogeneity: 0.8, energy: 0.6, contrast: 10, correlation: 0.8, edge_density: 8, texture_variance: 40 } },
+      { name: 'Denim', profile: { entropy: 6.5, homogeneity: 0.4, energy: 0.3, contrast: 35, correlation: 0.6, edge_density: 25, texture_variance: 200 } },
+      { name: 'Rayon', profile: { entropy: 4.8, homogeneity: 0.75, energy: 0.5, contrast: 8, correlation: 0.7, edge_density: 6, texture_variance: 50 } },
       { name: 'Nylon', profile: { entropy: 4.0, homogeneity: 0.85, energy: 0.7, contrast: 6, correlation: 0.85, edge_density: 4, texture_variance: 30 } },
-      { name: 'Canvas', profile: { entropy: 6.2, homogeneity: 0.45, energy: 0.25, contrast: 40, correlation: 0.5, edge_density: 30, texture_variance: 170 } },
-      { name: 'Velvet', profile: { entropy: 5.0, homogeneity: 0.75, energy: 0.6, contrast: 12, correlation: 0.8, edge_density: 5, texture_variance: 60 } },
-      { name: 'Leather', profile: { entropy: 3.0, homogeneity: 0.95, energy: 0.9, contrast: 3, correlation: 0.95, edge_density: 2, texture_variance: 10 } },
+      { name: 'Canvas', profile: { entropy: 6.2, homogeneity: 0.4, energy: 0.25, contrast: 40, correlation: 0.5, edge_density: 35, texture_variance: 170 } },
+      { name: 'Velvet', profile: { entropy: 4.0, homogeneity: 0.85, energy: 0.6, contrast: 10, correlation: 0.8, edge_density: 2, texture_variance: 40 } },
+      { name: 'Leather', profile: { entropy: 2.5, homogeneity: 0.98, energy: 0.95, contrast: 2, correlation: 0.98, edge_density: 1, texture_variance: 10 } },
       { name: 'Chiffon', profile: { entropy: 4.2, homogeneity: 0.8, energy: 0.65, contrast: 7, correlation: 0.75, edge_density: 5, texture_variance: 35 } },
-      { name: 'Fleece', profile: { entropy: 7.5, homogeneity: 0.2, energy: 0.05, contrast: 20, correlation: 0.2, edge_density: 8, texture_variance: 130 } },
-      { name: 'Jute', profile: { entropy: 7.8, homogeneity: 0.1, energy: 0.02, contrast: 50, correlation: 0.1, edge_density: 40, texture_variance: 250 } }
+      { name: 'Fleece', profile: { entropy: 7.2, homogeneity: 0.1, energy: 0.05, contrast: 15, correlation: 0.1, edge_density: 5, texture_variance: 130 } },
+      { name: 'Jute', profile: { entropy: 8.0, homogeneity: 0.05, energy: 0.02, contrast: 50, correlation: 0.1, edge_density: 45, texture_variance: 250 } }
     ];
 
     const patterns = [
