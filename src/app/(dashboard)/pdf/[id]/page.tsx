@@ -61,10 +61,36 @@ export default function PDFExportPage({ params }: { params: { id: string } }) {
         <h1 className="text-6xl font-black tracking-tighter text-zinc-900 mb-4 mt-20">NOVAWEAVE AI</h1>
         <p className="text-zinc-500 font-medium tracking-widest uppercase text-xl mb-12">Enterprise Quality Inspection Report</p>
         
-        <div className="bg-zinc-50 border border-zinc-200 p-8 rounded-xl w-full max-w-lg mb-12">
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Estimated Material Category</p>
-          <p className="text-4xl font-bold text-indigo-900 mb-2">{inspection.material_prediction || 'Unknown'}</p>
-          <p className="text-lg text-indigo-600 font-medium">Likely Pattern: {inspection.pattern_prediction || 'Plain'}</p>
+        <div className="flex gap-6 w-full max-w-4xl mb-12">
+          <div className="flex-1 bg-zinc-50 border border-zinc-200 p-8 rounded-xl text-left shadow-sm">
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-2">Similarity Ranking</p>
+            <div className="space-y-3">
+              {inspection.top_materials?.slice(0, 4).map((mat, i) => (
+                <div key={i} className="flex justify-between items-end border-b border-zinc-200 pb-2">
+                  <span className={`font-bold ${i === 0 ? 'text-indigo-900 text-xl tracking-tight' : 'text-zinc-600 text-sm'}`}>{mat.name}</span>
+                  <span className={`font-mono font-bold ${i === 0 ? 'text-indigo-600 text-lg' : 'text-zinc-500 text-sm'}`}>{mat.score}%</span>
+                </div>
+              ))}
+              {(!inspection.top_materials || inspection.top_materials.length === 0) && (
+                <p className="text-zinc-500 text-sm italic">Similarity data not available.</p>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex-1 bg-zinc-50 border border-zinc-200 p-8 rounded-xl text-left shadow-sm">
+             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-2">Texture Profile</p>
+             <div className="space-y-3">
+               {inspection.texture_profile?.slice(0, 6).map((prof, i) => (
+                 <div key={i} className="flex items-start gap-2 text-[10px] uppercase tracking-widest text-zinc-700 font-bold">
+                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                   <span className="leading-tight">{prof}</span>
+                 </div>
+               ))}
+               {(!inspection.texture_profile || inspection.texture_profile.length === 0) && (
+                <p className="text-zinc-500 text-sm italic">Texture profile not available.</p>
+               )}
+             </div>
+          </div>
         </div>
 
         <div className="mt-auto flex justify-between w-full text-left">

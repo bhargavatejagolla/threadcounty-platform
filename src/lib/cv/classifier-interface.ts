@@ -1,10 +1,19 @@
 import { FeatureVector } from '@/types/inspection';
 
+export interface PredictionScore {
+  name: string;
+  score: number;
+}
+
 export interface ClassificationResult {
   material: string;
   pattern: string;
   materialConfidence: number;
   patternConfidence: number;
+  topMaterials: PredictionScore[];
+  topPatterns: PredictionScore[];
+  textureProfile: string[];
+  matchedFeatures: string[];
 }
 
 export interface ClassifierPlugin {

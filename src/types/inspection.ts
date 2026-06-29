@@ -65,6 +65,10 @@ export interface InspectionRecord {
   // AI Classification Output
   material_prediction: string;
   pattern_prediction: string;
+  top_materials?: Array<{name: string, score: number}>;
+  top_patterns?: Array<{name: string, score: number}>;
+  texture_profile?: string[];
+  matched_features?: string[];
 
   // Top-Level Metrics
   quality: number;

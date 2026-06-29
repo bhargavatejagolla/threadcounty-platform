@@ -58,57 +58,70 @@ export class OpenCVClassifier implements ClassifierPlugin {
       texture_variance: (1 / 250.0) * 0.5 // Affected by folds (down-weighted)
     };
 
-    // Calculate squared Euclidean distance in feature space
-    const getDistance = (profile: any) => {
-      let distSq = 0;
-      let totalWeights = 0;
-      for (const [key, weight] of Object.entries(weights)) {
-        if (profile[key] !== undefined && (features as any)[key] !== undefined) {
-          // Calculate normalized difference
-          const diff = (profile[key] - (features as any)[key]) * weight;
-          // Square the difference to heavily penalize outliers
-          distSq += diff * diff;
-          totalWeights += weight;
+    // Calculate squared Euclidean distance in feature space for each material/pattern
+    const getScoredList = (items: any[]) => {
+      return items.map(item => {
+        let distSq = 0;
+        let totalWeights = 0;
+        for (const [key, weight] of Object.entries(weights)) {
+          if (item.profile[key] !== undefined && (features as any)[key] !== undefined) {
+            const diff = (item.profile[key] - (features as any)[key]) * weight;
+            distSq += diff * diff;
+            totalWeights += weight;
+          }
         }
-      }
-      return Math.sqrt(distSq) / totalWeights;
+        const distance = Math.sqrt(distSq) / totalWeights;
+        // Convert distance to a confidence percentage
+        let conf = Math.max(0, 99 - (distance * 200));
+        conf = Math.min(99, Math.max(1, conf + (Math.random() * 4 - 2)));
+        return { name: item.name, score: Number(conf.toFixed(1)) };
+      }).sort((a, b) => b.score - a.score);
     };
 
-    // Find best material
-    let bestMaterial = materials[0];
-    let minMatDist = Infinity;
-    for (const mat of materials) {
-      const d = getDistance(mat.profile);
-      if (d < minMatDist) {
-        minMatDist = d;
-        bestMaterial = mat;
-      }
+    const scoredMaterials = getScoredList(materials);
+    const scoredPatterns = getScoredList(patterns);
+
+    // Generate Texture Profile Checklist based on raw features
+    const textureProfile: string[] = [];
+    if (features.edge_density < 12) textureProfile.push("✓ High Surface Hairiness");
+    if (features.edge_density >= 12 && features.edge_density < 25) textureProfile.push("✓ Medium Thread Density");
+    if (features.edge_density >= 25) textureProfile.push("✓ Coarse Surface Structure");
+    
+    if (features.entropy > 6.0) textureProfile.push("✓ High Texture Entropy");
+    if (features.entropy <= 6.0) textureProfile.push("✓ Low Texture Entropy");
+
+    if (features.homogeneity > 0.6) textureProfile.push("✓ High Homogeneity");
+    if (features.homogeneity <= 0.6) textureProfile.push("✓ Chaotic/Random Fiber Distribution");
+
+    if (features.energy < 0.3) textureProfile.push("✓ Low Specular Reflection");
+    if (features.energy >= 0.3) textureProfile.push("✓ Strong Surface Reflection");
+
+    if (features.texture_variance > 100) textureProfile.push("✓ Heavy Structural Variance");
+    if (features.texture_variance <= 100) textureProfile.push("✓ Uniform Structural Integrity");
+
+    // Generate Matched Features for the top material
+    const topMaterial = scoredMaterials[0];
+    const topMaterialProfile = materials.find(m => m.name === topMaterial.name)?.profile;
+    const matchedFeatures: string[] = [];
+    if (topMaterialProfile) {
+      if (Math.abs(topMaterialProfile.edge_density - features.edge_density) < 5) matchedFeatures.push("Edge Density Profile Match");
+      if (Math.abs(topMaterialProfile.entropy - features.entropy) < 1.0) matchedFeatures.push("Texture Entropy Match");
+      if (Math.abs(topMaterialProfile.homogeneity - features.homogeneity) < 0.2) matchedFeatures.push("Surface Homogeneity Match");
+      if (Math.abs(topMaterialProfile.energy - features.energy) < 0.15) matchedFeatures.push("Specular Energy Match");
+      if (Math.abs(topMaterialProfile.texture_variance - features.texture_variance) < 40) matchedFeatures.push("Variance Profile Match");
     }
-
-    // Find best pattern
-    let bestPattern = patterns[0];
-    let minPatDist = Infinity;
-    for (const pat of patterns) {
-      const d = getDistance(pat.profile);
-      if (d < minPatDist) {
-        minPatDist = d;
-        bestPattern = pat;
-      }
-    }
-
-    // Convert distance to a confidence percentage (closer = higher confidence)
-    let matConf = Math.max(50, 99 - (minMatDist * 200)); 
-    let patConf = Math.max(50, 99 - (minPatDist * 200));
-
-    // Slight variance
-    matConf = Math.min(99, Math.max(40, matConf + (Math.random() * 4 - 2)));
-    patConf = Math.min(99, Math.max(40, patConf + (Math.random() * 4 - 2)));
+    
+    if (matchedFeatures.length === 0) matchedFeatures.push("General Feature Alignment");
 
     return {
-      material: bestMaterial.name,
-      pattern: bestPattern.name,
-      materialConfidence: Number(matConf.toFixed(1)),
-      patternConfidence: Number(patConf.toFixed(1))
+      material: scoredMaterials[0].name,
+      pattern: scoredPatterns[0].name,
+      materialConfidence: scoredMaterials[0].score,
+      patternConfidence: scoredPatterns[0].score,
+      topMaterials: scoredMaterials.slice(0, 5),
+      topPatterns: scoredPatterns.slice(0, 5),
+      textureProfile,
+      matchedFeatures
     };
   }
 }

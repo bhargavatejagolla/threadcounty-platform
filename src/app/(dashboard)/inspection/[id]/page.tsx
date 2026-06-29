@@ -372,32 +372,74 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
             </Card>
           </motion.div>
 
-          {/* Core Metrics */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Explainability Engine */}
+          <div className="space-y-4">
             <motion.div variants={fadeUp}>
-              <Card className="bg-zinc-950/50 border-white/10 text-center hover:bg-zinc-900/50 transition-colors h-full flex flex-col justify-center">
-                <CardContent className="p-6">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Estimated Material Category</p>
-                  <div className="text-2xl font-bold text-white tracking-tight flex items-baseline justify-center gap-1">
-                    {inspection.material_prediction || 'Unknown'}
-                  </div>
-                  <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-2">Likely Pattern: {inspection.pattern_prediction || 'Plain'}</p>
+              <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                  <Fingerprint className="w-32 h-32" />
+                </div>
+                <CardHeader className="pb-3 border-b border-white/5 relative z-10">
+                  <CardTitle className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5" /> Similarity Against Material Library
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-5 relative z-10 space-y-4">
+                  {inspection.top_materials?.slice(0, 4).map((mat, i) => (
+                    <div key={i} className="space-y-1.5">
+                      <div className="flex justify-between text-xs items-end">
+                        <span className={`font-bold tracking-wide ${i === 0 ? 'text-white' : 'text-zinc-400'}`}>{mat.name}</span>
+                        <span className={`font-mono ${i === 0 ? 'text-indigo-400 font-bold' : 'text-zinc-500'}`}>{mat.score}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${mat.score}%` }}
+                          transition={{ duration: 1.5, delay: 0.2 + (i * 0.1), ease: "easeOut" }}
+                          className={`h-full rounded-full ${i === 0 ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]' : 'bg-zinc-700'}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {(!inspection.top_materials || inspection.top_materials.length === 0) && (
+                    <div className="text-zinc-500 text-sm italic">Similarity data not available for this legacy record.</div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
-            
-            <motion.div variants={fadeUp}>
-              <Card className="bg-zinc-950/50 border-white/10 text-center relative overflow-hidden group hover:border-emerald-500/30 transition-all shadow-[0_0_0_rgba(16,185,129,0)] hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] h-full flex flex-col justify-center">
-                <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <CardContent className="p-6 relative">
-                  <p className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest mb-2">Quality Score</p>
-                  <div className="text-4xl font-bold text-emerald-400 tracking-tight flex items-baseline justify-center gap-0.5">
-                    {inspection.quality}
-                    <span className="text-emerald-500/40 text-xl font-medium">/100</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <motion.div variants={fadeUp} className="h-full">
+                <Card className="bg-zinc-950/50 border-white/10 h-full hover:border-emerald-500/30 transition-colors">
+                  <CardHeader className="pb-3 border-b border-white/5">
+                    <CardTitle className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">Matched Features</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4 space-y-3">
+                    {inspection.matched_features?.map((feat, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs text-zinc-300">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <span className="leading-tight">{feat}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="h-full">
+                <Card className="bg-zinc-950/50 border-white/10 h-full hover:border-indigo-500/30 transition-colors">
+                  <CardHeader className="pb-3 border-b border-white/5">
+                    <CardTitle className="text-[10px] font-bold text-indigo-400/70 uppercase tracking-widest">Texture Profile</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4 space-y-3">
+                    {inspection.texture_profile?.slice(0, 5).map((prof, i) => (
+                      <div key={i} className="flex items-start gap-2 text-[10px] uppercase tracking-wider text-zinc-400 font-medium leading-snug">
+                        {prof}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
           </div>
 
           {/* Confidence Breakdown */}

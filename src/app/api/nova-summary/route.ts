@@ -9,18 +9,24 @@ const groq = new Groq({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { metrics, qualityScore, reliability, modelConfidence, material, pattern } = body;
+    const { metrics, qualityScore, reliability, modelConfidence, topMaterials, topPatterns, textureProfile, matchedFeatures } = body;
+
+    const topMaterialName = topMaterials?.[0]?.name || 'Unknown';
+    const topMaterialScore = topMaterials?.[0]?.score || 0;
 
     const prompt = `
 You are NovaWeave AI, an enterprise textile computer vision analysis assistant.
 
 You NEVER guess material types or patterns.
-The NovaWeave Vision Engine has already deterministically classified this fabric.
-Your job is to translate the classification and mathematical texture descriptors into professional manufacturing insights.
+The NovaWeave Multi-Feature Vision Engine has probabilistically ranked the fabric based on visual texture similarity.
+Your job is to translate the ranked similarities and mathematical texture descriptors into professional manufacturing insights.
 
-VISION ENGINE CLASSIFICATION (DO NOT CONTRADICT):
-Material: ${material}
-Pattern: ${pattern}
+VISION ENGINE SIMILARITY RANKING (DO NOT CONTRADICT):
+Top Material Match: ${topMaterialName} (${topMaterialScore}%)
+Secondary Matches: ${topMaterials?.slice(1).map((m: any) => \`\${m.name} (\${m.score}%)\`).join(', ')}
+
+TEXTURE PROFILE:
+${textureProfile?.join('\\n')}
 
 INPUT FEATURE VECTOR:
 Entropy (Complexity): ${metrics.entropy}

@@ -80,19 +80,24 @@ NovaWeave is built for absolute transparency and auditability in industrial envi
 
 ```mermaid
 graph TD
-    A[Camera / Upload] -->|Raw Image| B(Image Quality Validation)
-    B -->|Blur/Lighting Check| C{Valid?}
-    C -->|No| D[Reject with Warning]
-    C -->|Yes| E[OpenCV Feature Extractor]
-    
-    E -->|LBP, GLCM, Edge Density| F[kNN Feature Space Matcher]
-    F -->|Material & Pattern| G[(Supabase PostgreSQL)]
-    
-    C -.->|Future Expansion| Y[YOLOv8-Nano ONNX]
-    Y -.->|Defect Bounding Boxes| G
-    
-    F -->|Computed Metrics| H[Insight Engine / LLM]
-    H -->|Executive Summary| I[Mission Control & PDF Reports]
+    A[Image] --> B[Image Quality Validation]
+    B --> C[Color Normalization]
+    C --> D[Histogram Equalization]
+    D --> E[Noise Reduction]
+    E --> F[Edge Detection]
+    F --> G[LBP]
+    G --> H[GLCM]
+    H --> I[FFT]
+    I --> J[HOG]
+    J --> K[Feature Fusion]
+    K --> L[Material Similarity Engine]
+    L --> M[Pattern Similarity Engine]
+    M --> N[Inspection Reliability]
+    N --> O[Groq Insight Engine]
+    O --> P[(Supabase)]
+    P --> Q[Mission Control]
+    Q --> R[Reports]
+    R --> S[PDF]
 ```
 
 ---

@@ -69,7 +69,7 @@ export default function FabricScannerPage() {
       // Step 2: NovaWeave Material Classification (Deterministic Plugin)
       addLog('NovaWeave Classifier analyzing features...');
       const classifier = new OpenCVClassifier();
-      const { material, pattern, materialConfidence, patternConfidence } = await classifier.classify(metrics);
+      const { material, pattern, materialConfidence, patternConfidence, topMaterials, topPatterns, textureProfile, matchedFeatures } = await classifier.classify(metrics);
       await delay(400);
       addLog(`Classification complete: ${material} (${materialConfidence}%) - ${pattern} (${patternConfidence}%)`);
 
@@ -80,7 +80,7 @@ export default function FabricScannerPage() {
       const response = await fetch('/api/nova-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metrics, qualityScore, reliability, modelConfidence, material, pattern })
+        body: JSON.stringify({ metrics, qualityScore, reliability, modelConfidence, topMaterials, topPatterns, textureProfile, matchedFeatures })
       });
 
       if (!response.ok) throw new Error('Nova AI Inference failed');
@@ -111,6 +111,12 @@ export default function FabricScannerPage() {
             feature_vector: metrics,
             material_prediction: material,
             pattern_prediction: pattern,
+            
+            // Explainability Engine
+            top_materials: topMaterials,
+            top_patterns: topPatterns,
+            texture_profile: textureProfile,
+            matched_features: matchedFeatures,
             
             // Flat fallback (optional for now)
             entropy: metrics.entropy,
@@ -164,6 +170,11 @@ export default function FabricScannerPage() {
           feature_vector: metrics,
           material_prediction: material,
           pattern_prediction: pattern,
+          
+          top_materials: topMaterials,
+          top_patterns: topPatterns,
+          texture_profile: textureProfile,
+          matched_features: matchedFeatures,
           
           entropy: metrics.entropy,
           energy: metrics.energy,
@@ -418,7 +429,7 @@ export default function FabricScannerPage() {
                     {!isScanning && logs.some(l => l.msg.startsWith('ERROR')) && (
                       <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400">
                         <span className="font-bold uppercase tracking-widest text-[10px] block mb-1">System Halt</span>
-                        Make sure you have run the `supabase-schema-v3.sql` script in your Supabase SQL Editor. The database schema must be updated to accept the new Enterprise feature vector payload.
+                        Make sure you have run the `supabase-schema-v4-explainable.sql` script in your Supabase SQL Editor. The database schema must be updated to accept the new Explainability arrays.
                       </div>
                     )}
                   </div>
