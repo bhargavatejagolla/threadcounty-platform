@@ -15,7 +15,7 @@ const StarBorder = ({
   className = '',
   color = 'white',
   speed = '6s',
-  thickness = 1,
+  thickness = 1.5,
   children,
   ...rest
 }: StarBorderProps) => {
@@ -23,22 +23,23 @@ const StarBorder = ({
     <Component
       className={`star-border-container ${className}`}
       style={{
-        padding: `${thickness}px 0`,
+        padding: `${thickness}px`,
+        '--star-color': color,
         ...rest.style
-      }}
+      } as React.CSSProperties}
       {...rest}
     >
       <div
         className="border-gradient-bottom"
         style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
+          background: `radial-gradient(ellipse 80% 50% at 50% 50%, ${color} 0%, transparent 100%)`,
           animationDuration: speed
         }}
       ></div>
       <div
         className="border-gradient-top"
         style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
+          background: `radial-gradient(ellipse 80% 50% at 50% 50%, ${color} 0%, transparent 100%)`,
           animationDuration: speed
         }}
       ></div>

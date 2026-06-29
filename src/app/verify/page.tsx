@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import dynamic from 'next/dynamic';
+const LiquidChrome = dynamic(() => import('@/components/ui/LiquidChrome'), { ssr: false });
 
 function VerifyContent() {
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
@@ -104,12 +106,18 @@ function VerifyContent() {
 
 export default function VerifyPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 dark:from-zinc-950 dark:via-indigo-950/30 dark:to-zinc-950 p-4 overflow-hidden relative">
-      {/* Decorative Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob dark:bg-purple-900/40"></div>
-      <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-cyan-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-cyan-900/40"></div>
-      <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-pink-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-4000 dark:bg-pink-900/40"></div>
+    <div className="flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden relative">
       
+      {/* LiquidChrome Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <LiquidChrome
+          baseColor={[0.1, 0.1, 0.15]}
+          speed={0.4}
+          amplitude={0.6}
+          interactive
+        />
+      </div>
+
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
 
       <Suspense fallback={

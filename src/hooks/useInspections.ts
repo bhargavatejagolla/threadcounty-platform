@@ -24,9 +24,18 @@ export function useInspection(id: string) {
   return useQuery({
     queryKey: ['inspections', id],
     queryFn: async () => {
-      if (id === 'local') {
-        const local = localStorage.getItem('local_inspection');
-        if (local) return JSON.parse(local) as InspectionRecord;
+      if (id === 'local' || id.startsWith('local_')) {
+        const local = localStorage.getItem('local_inspections');
+        if (local) {
+          const arr = JSON.parse(local);
+          if (Array.isArray(arr)) {
+            const found = arr.find((r: any) => r.id === id);
+            if (found) return found as InspectionRecord;
+          }
+        }
+        // Fallback for older singular item
+        const oldLocal = localStorage.getItem('local_inspection');
+        if (oldLocal) return JSON.parse(oldLocal) as InspectionRecord;
         throw new Error('Local inspection not found');
       }
 

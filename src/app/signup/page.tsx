@@ -85,7 +85,7 @@ export default function SignupPage() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
@@ -126,9 +126,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden relative selection:bg-white/20">
-      {/* Dynamic WebGL LineWaves Background */}
-      <div className="fixed inset-0 z-0 opacity-100 pointer-events-auto">
+    <div className="flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden relative selection:bg-indigo-500/30">
+      {/* LineWaves WebGL Background */}
+      <div className="fixed inset-0 z-0">
         <LineWaves
           speed={0.3}
           innerLineCount={32}
@@ -137,14 +137,15 @@ export default function SignupPage() {
           rotation={-45}
           edgeFadeWidth={0}
           colorCycleSpeed={1}
-          brightness={0.3}
+          brightness={0.2}
           color1="#ffffff"
-          color2="#a5b4fc"
-          color3="#4f46e5"
-          enableMouseInteraction
+          color2="#ffffff"
+          color3="#ffffff"
+          enableMouseInteraction={true}
           mouseInfluence={2}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#000000_100%)] pointer-events-none"></div>
+        {/* Radial vignette to focus attention on the form */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,_transparent_0%,_rgba(0,0,0,0.75)_60%,_#000000_100%)] pointer-events-none" />
       </div>
 
       <Link href="/" className="absolute top-8 left-8 z-50 flex items-center text-zinc-500 hover:text-white transition-colors group">

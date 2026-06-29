@@ -14,6 +14,8 @@ import { InspectionRecord } from '@/types/inspection';
 import Loading from '@/components/ui/Loading';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import dynamic from 'next/dynamic';
+const Plasma = dynamic(() => import('@/components/ui/Plasma'), { ssr: false });
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -23,7 +25,7 @@ const staggerContainer = {
   }
 };
 
-const fadeUp = {
+const fadeUp: any = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
@@ -40,15 +42,20 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
 
   useEffect(() => {
     async function fetchInspection() {
-      if (params.id === 'local') {
-        const localData = localStorage.getItem('local_inspection');
+      // Check local storage fallback first
+      if (params.id.startsWith('local_')) {
+        const localData = localStorage.getItem('local_inspections');
         if (localData) {
-          setInspection(JSON.parse(localData));
-        } else {
-          console.error("No local data found in fallback mode.");
+          try {
+            const parsedArray = JSON.parse(localData);
+            const found = parsedArray.find((r: any) => r.id === params.id || r.inspection_id === params.id);
+            if (found) {
+              setInspection(found);
+              setLoading(false);
+              return;
+            }
+          } catch(e) {}
         }
-        setLoading(false);
-        return;
       }
 
       try {
@@ -103,14 +110,75 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
   // Removed synthetic sub-confidence variables as we now use real metrics
 
   return (
-    <motion.div 
-      variants={staggerContainer}
-      initial="hidden"
-      animate="show"
-      className="max-w-7xl mx-auto space-y-6"
-    >
-      {/* Top Action Bar */}
-      <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-4">
+    <div className="relative min-h-[calc(100vh-80px)] print:min-h-0">
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          body, html, main { 
+            background: white !important; 
+            color: black !important; 
+          }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .print-hide { display: none !important; }
+          .print-break-avoid { page-break-inside: avoid !important; }
+          /* Force cards to be white with black text for print */
+          .print-card {
+            background-color: white !important;
+            border: 1px solid #d1d5db !important;
+            color: black !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            page-break-inside: avoid !important;
+          }
+          .print-card * {
+            color: black !important;
+          }
+          .print-text-muted {
+            color: #4b5563 !important;
+          }
+          .print-grid-stack {
+            display: block !important;
+            width: 100% !important;
+          }
+          .print-image-container {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 2rem;
+          }
+        }
+      `}} />
+
+      {/* Background Plasma */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-30 mix-blend-screen print-hide">
+        <Plasma 
+          color="#8b5cf6" // Purple plasma
+          speed={1.5}
+          direction="forward"
+          scale={1.2}
+          opacity={1}
+          mouseInteractive={true}
+        />
+      </div>
+
+      <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 max-w-7xl mx-auto space-y-6 pt-6 px-4 pb-12 print:p-0 print:space-y-4"
+      >
+        {/* Print Only Header */}
+        <div className="hidden print:block mb-8 border-b border-gray-300 pb-4">
+          <h1 className="text-3xl font-bold">NovaWeave Inspection Report</h1>
+          <p className="text-gray-600 mt-2">ID: {inspection.inspection_id}</p>
+          <p className="text-gray-600">Generated: {new Date(inspection.created_at).toLocaleString()}</p>
+          <p className="text-gray-600">Hash: {inspection.analysis_hash}</p>
+        </div>
+
+        {/* Top Action Bar */}
+      <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-4 print-hide">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-zinc-400 hover:text-white rounded-full hover:bg-white/10 transition-colors">
             <ArrowLeft className="h-5 w-5" />
@@ -156,19 +224,19 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 print-grid-stack">
         {/* Left Column: Interactive Viewer */}
         <div className="lg:col-span-7 space-y-6">
           <motion.div variants={fadeUp}>
-            <Card className="bg-zinc-950/80 border-white/10 overflow-hidden relative shadow-2xl backdrop-blur-xl">
+            <Card className="print-card bg-zinc-950/80 border-white/10 overflow-hidden relative shadow-2xl backdrop-blur-xl">
               <CardContent className="p-0">
-                <div className="aspect-square sm:aspect-video relative bg-black group overflow-hidden">
+                <div className="aspect-square sm:aspect-video relative bg-black print:bg-white group overflow-hidden print-image-container">
                   
                   {/* Grid Background behind image */}
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
                   {/* Simulated Image Viewer */}
-                  <div className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${activeView === 'original' ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${activeView === 'original' ? 'opacity-100' : 'opacity-0'} print:opacity-100`}>
                     <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${inspection.image_url})` }}></div>
                   </div>
                   
@@ -202,7 +270,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
                   </div>
 
                   {/* Simulated Contours */}
-                  <div className={`absolute inset-0 bg-zinc-950 transition-opacity duration-700 ease-in-out flex items-center justify-center ${activeView === 'contours' ? 'opacity-100 z-10' : 'opacity-0'}`}>
+                  <div className={`absolute inset-0 bg-zinc-950 transition-opacity duration-700 ease-in-out flex items-center justify-center print-hide ${activeView === 'contours' ? 'opacity-100 z-10' : 'opacity-0'}`}>
                      <div className="w-full h-full bg-cover bg-center grayscale contrast-[2] brightness-50 opacity-40" style={{ backgroundImage: `url(${inspection.image_url})` }}></div>
                      <div className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/30 via-transparent to-transparent"></div>
                      <div className="absolute inset-0 border border-emerald-500/20 rounded-full scale-[0.8] mix-blend-screen shadow-[0_0_20px_rgba(16,185,129,0.3)]"></div>
@@ -221,7 +289,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
 
                   {/* Replay Overlay */}
                   {isReplaying && (
-                    <div className="absolute inset-x-0 bottom-0 h-1.5 bg-zinc-900/50 z-50 backdrop-blur-sm">
+                    <div className="absolute inset-x-0 bottom-0 h-1.5 bg-zinc-900/50 z-50 backdrop-blur-sm print-hide">
                       <motion.div 
                         className="h-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,1)]"
                         initial={{ width: "0%" }}
@@ -234,7 +302,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="absolute top-4 left-4 z-50 bg-zinc-950/80 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl"
+                      className="absolute top-4 left-4 z-50 bg-zinc-950/80 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl print-hide"
                     >
                       <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)] animate-pulse"></div>
                       <span className="text-[10px] font-bold text-white uppercase tracking-widest">
@@ -252,7 +320,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
                 </div>
 
                 {/* View Toggles */}
-                <div className="p-4 bg-zinc-950/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10">
+                <div className="p-4 bg-zinc-950/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10 print-hide">
                   <div className="flex bg-zinc-900/80 rounded-xl p-1 border border-white/5 shadow-inner overflow-x-auto no-scrollbar max-w-full">
                     {(['original', 'histogram', 'edges', 'glcm', 'lbp', 'heatmap', 'contours'] as const).map((view) => (
                       <button
@@ -286,7 +354,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
 
           {/* Feature Explorer */}
           <motion.div variants={fadeUp}>
-            <Card className="bg-zinc-950/50 border-white/10 overflow-hidden backdrop-blur-sm">
+            <Card className="print-card bg-zinc-950/50 border-white/10 overflow-hidden backdrop-blur-sm">
               <CardHeader 
                 className="border-b border-white/5 pb-4 cursor-pointer hover:bg-white/[0.03] transition-colors" 
                 onClick={() => setShowAdvanced(!showAdvanced)}
@@ -362,7 +430,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
           
           {/* Executive Summary */}
           <motion.div variants={fadeUp}>
-            <Card className="bg-zinc-950/80 border-white/10 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
+            <Card className="print-card bg-zinc-950/80 border-white/10 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-[60px] rounded-full pointer-events-none"></div>
               <CardHeader className="pb-3 border-b border-white/5">
                 <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
@@ -401,7 +469,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
           {/* Explainability Engine */}
           <div className="space-y-4">
             <motion.div variants={fadeUp}>
-              <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-sm relative overflow-hidden">
+              <Card className="print-card bg-zinc-950/50 border-white/10 backdrop-blur-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-5">
                   <Fingerprint className="w-32 h-32" />
                 </div>
@@ -436,7 +504,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
 
             <div className="grid grid-cols-2 gap-4">
               <motion.div variants={fadeUp} className="h-full">
-                <Card className="bg-zinc-950/50 border-white/10 h-full hover:border-emerald-500/30 transition-colors">
+                <Card className="print-card bg-zinc-950/50 border-white/10 h-full hover:border-emerald-500/30 transition-colors">
                   <CardHeader className="pb-3 border-b border-white/5">
                     <CardTitle className="text-[10px] font-bold text-emerald-500/70 uppercase tracking-widest">Matched Features</CardTitle>
                   </CardHeader>
@@ -452,7 +520,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
               </motion.div>
 
               <motion.div variants={fadeUp} className="h-full">
-                <Card className="bg-zinc-950/50 border-white/10 h-full hover:border-indigo-500/30 transition-colors">
+                <Card className="print-card bg-zinc-950/50 border-white/10 h-full hover:border-indigo-500/30 transition-colors">
                   <CardHeader className="pb-3 border-b border-white/5">
                     <CardTitle className="text-[10px] font-bold text-indigo-400/70 uppercase tracking-widest">Texture Profile</CardTitle>
                   </CardHeader>
@@ -470,7 +538,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
 
           {/* Confidence Breakdown */}
           <motion.div variants={fadeUp}>
-            <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-sm">
+            <Card className="print-card bg-zinc-950/50 border-white/10 backdrop-blur-sm">
               <CardHeader className="pb-4 border-b border-white/5">
                 <CardTitle className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Inspection Reliability</CardTitle>
               </CardHeader>
@@ -540,6 +608,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
           </motion.div>
         </div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

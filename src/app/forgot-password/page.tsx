@@ -12,6 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import dynamic from 'next/dynamic';
+const DotField = dynamic(() => import('@/components/ui/DotField'), { ssr: false });
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -46,7 +48,24 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-pink-900/40 p-4 relative overflow-hidden">
+      <div className="flex min-h-screen items-center justify-center bg-black p-4 relative overflow-hidden">
+        {/* DotField Background */}
+        <div className="absolute inset-0 z-0 pointer-events-auto">
+          <DotField
+            dotRadius={1.5}
+            dotSpacing={14}
+            bulgeStrength={67}
+            glowRadius={160}
+            sparkle={false}
+            waveAmplitude={0}
+            cursorRadius={500}
+            cursorForce={0.1}
+            bulgeOnly
+            gradientFrom="#6366f1"
+            gradientTo="#a855f7"
+            glowColor="#111"
+          />
+        </div>
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
         <Card className="w-full max-w-md backdrop-blur-xl bg-white/40 dark:bg-black/40 border-white/30 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] relative z-10">
           <CardHeader>
@@ -62,12 +81,26 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 dark:from-zinc-950 dark:via-indigo-950/30 dark:to-zinc-950 p-4 overflow-hidden relative">
-      {/* Decorative Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob dark:bg-purple-900/40"></div>
-      <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-cyan-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-cyan-900/40"></div>
-      <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-pink-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-4000 dark:bg-pink-900/40"></div>
+    <div className="flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden relative">
       
+      {/* DotField Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+          cursorRadius={500}
+          cursorForce={0.1}
+          bulgeOnly
+          gradientFrom="#6366f1"
+          gradientTo="#a855f7"
+          glowColor="#111"
+        />
+      </div>
+
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
 
       <Card className="w-full max-w-md backdrop-blur-2xl bg-white/60 dark:bg-zinc-900/60 border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] relative z-10 rounded-3xl overflow-hidden">

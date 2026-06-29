@@ -7,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner'; // adjust if using sonner
+import dynamic from 'next/dynamic';
+
+const ColorBends = dynamic(() => import('@/components/ui/ColorBends'), { ssr: false });
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -52,18 +55,37 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
-        <p className="text-muted-foreground">View and manage all registered users.</p>
+    <div className="relative min-h-[calc(100vh-80px)]">
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+        <ColorBends
+          colors={["#ff5c7a", "#8a5cff", "#00ffd1"]}
+          rotation={90}
+          speed={0.1}
+          scale={1}
+          frequency={1}
+          warpStrength={1}
+          mouseInfluence={1}
+          noise={0.1}
+          parallax={0.5}
+          iterations={1}
+          intensity={1.2}
+          bandWidth={6}
+          transparent
+          autoRotate={0}
+        />
       </div>
+      <div className="max-w-6xl mx-auto space-y-6 relative z-10">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">Manage Users</h1>
+          <p className="text-zinc-400 mt-1">View and manage all registered users.</p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>User Directory</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
+        <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>User Directory</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Email</TableHead>
@@ -110,6 +132,7 @@ export default function AdminUsersPage() {
           </Table>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase/client';
+import dynamic from 'next/dynamic';
+
+const ColorBends = dynamic(() => import('@/components/ui/ColorBends'), { ssr: false });
 
 export default function AdminUploadsPage() {
   const [uploads, setUploads] = useState<any[]>([]);
@@ -51,13 +54,32 @@ export default function AdminUploadsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Manage Uploads</h1>
-        <p className="text-muted-foreground">View and moderate all images uploaded to the platform.</p>
+    <div className="relative min-h-[calc(100vh-80px)]">
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+        <ColorBends
+          colors={["#ff5c7a", "#8a5cff", "#00ffd1"]}
+          rotation={90}
+          speed={0.1}
+          scale={1}
+          frequency={1}
+          warpStrength={1}
+          mouseInfluence={1}
+          noise={0.1}
+          parallax={0.5}
+          iterations={1}
+          intensity={1.2}
+          bandWidth={6}
+          transparent
+          autoRotate={0}
+        />
       </div>
+      <div className="p-6 max-w-6xl mx-auto space-y-6 relative z-10">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">Manage Uploads</h1>
+          <p className="text-zinc-400 mt-1">View and moderate all images uploaded to the platform.</p>
+        </div>
 
-      <Card>
+        <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Recent Uploads (Global)</CardTitle>
         </CardHeader>
@@ -105,6 +127,7 @@ export default function AdminUploadsPage() {
           </Table>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

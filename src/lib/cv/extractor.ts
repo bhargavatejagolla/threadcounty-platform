@@ -8,7 +8,6 @@ import { FeatureVector } from '@/types/inspection';
 export async function extractImageFeatures(dataUrl: string): Promise<FeatureVector> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "Anonymous";
     
     img.onload = () => {
       const canvas = document.createElement('canvas');

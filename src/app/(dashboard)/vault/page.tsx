@@ -8,6 +8,8 @@ import { Library, Search, SlidersHorizontal, ArrowRight, Download, Filter, Arrow
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { InspectionRecord } from '@/types/inspection';
+import dynamic from 'next/dynamic';
+const LightRays = dynamic(() => import('@/components/ui/LightRays'), { ssr: false });
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -33,12 +35,16 @@ export default function AnalysisVaultPage() {
         
       let allRecords = data ? [...(data as InspectionRecord[])] : [];
       
-      const localData = localStorage.getItem('local_inspection');
+      const localData = localStorage.getItem('local_inspections');
       if (localData) {
         try {
-          const parsed = JSON.parse(localData);
-          if (!allRecords.find(r => r.id === parsed.id || r.inspection_id === parsed.inspection_id)) {
-            allRecords.unshift(parsed);
+          const parsedArray = JSON.parse(localData);
+          if (Array.isArray(parsedArray)) {
+            parsedArray.forEach(parsed => {
+              if (!allRecords.find(r => r.id === parsed.id || r.inspection_id === parsed.inspection_id)) {
+                allRecords.unshift(parsed);
+              }
+            });
           }
         } catch(e) {}
       }
@@ -109,8 +115,27 @@ export default function AnalysisVaultPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="relative min-h-[calc(100vh-80px)]">
+      {/* Light Rays Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-50 mix-blend-screen">
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#818cf8"
+          raysSpeed={1.2}
+          lightSpread={0.8}
+          rayLength={4}
+          followMouse={true}
+          mouseInfluence={0.3}
+          noiseAmount={0.05}
+          distortion={0.3}
+          pulsating={true}
+          fadeDistance={1.2}
+          saturation={1.5}
+        />
+      </div>
+
+      <div className="relative z-10 space-y-6 max-w-7xl mx-auto pt-6 px-4 pb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
             <Library className="h-8 w-8 text-indigo-400" />
@@ -131,7 +156,7 @@ export default function AnalysisVaultPage() {
       </div>
 
       {/* Search and Advanced Filters */}
-      <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-xl">
+      <Card className="bg-white/[0.02] border-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
@@ -140,14 +165,14 @@ export default function AnalysisVaultPage() {
               placeholder="Search by ID, Hash, Material, or Pattern..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-zinc-900 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all backdrop-blur-md"
             />
           </div>
           <div className="flex gap-2">
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-md"
             >
               <option value="date">Sort by Date</option>
               <option value="confidence">Sort by Confidence</option>
@@ -176,8 +201,8 @@ export default function AnalysisVaultPage() {
               transition={{ delay: i * 0.05 }}
               key={item.id}
             >
-              <Card className="bg-zinc-950/50 border-white/10 hover:border-indigo-500/30 transition-colors group cursor-pointer" onClick={() => router.push(`/inspection/${item.id}`)}>
-                <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <Card className="bg-white/[0.02] border-white/10 backdrop-blur-3xl hover:border-indigo-500/40 hover:shadow-[0_8px_32px_0_rgba(79,70,229,0.2)] transition-all duration-500 group cursor-pointer relative overflow-hidden" onClick={() => router.push(`/inspection/${item.id}`)}>
+                <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
                   <div className="flex items-center gap-6">
                     <div className="h-16 w-16 bg-zinc-900 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
                       <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${item.image_url})` }}></div>
@@ -243,7 +268,7 @@ export default function AnalysisVaultPage() {
           ))}
         </div>
       ) : (
-        <Card className="bg-zinc-950/50 border-white/10 backdrop-blur-xl">
+        <Card className="bg-white/[0.02] border-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
           <CardContent className="p-12 flex flex-col items-center justify-center text-center">
             <div className="h-20 w-20 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center mb-6">
               <Search className="h-8 w-8 text-zinc-600" />
@@ -254,6 +279,7 @@ export default function AnalysisVaultPage() {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }

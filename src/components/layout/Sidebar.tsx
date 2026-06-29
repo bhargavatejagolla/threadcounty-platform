@@ -73,9 +73,7 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="flex items-center h-16 flex-shrink-0 px-6 border-b border-white/5">
           <Link href="/mission-control" className="flex items-center gap-2 group">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-              <Search className="h-5 w-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="NovaWeave Logo" className="h-8 w-auto rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] transition-shadow" />
             <span className="font-bold text-lg tracking-tight text-white group-hover:text-indigo-100 transition-colors">
               NovaWeave AI™
             </span>

@@ -9,14 +9,27 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+const DarkVeil = dynamic(() => import('@/components/ui/DarkVeil'), { ssr: false });
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({ totalUsers: 1420, totalUploads: 12450, totalAnalyses: 12400 });
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="relative min-h-screen">
+      <div className="absolute inset-0 z-0 overflow-hidden opacity-50 mix-blend-screen pointer-events-none">
+        <DarkVeil
+          hueShift={280} // Shift to purple/indigo spectrum
+          noiseIntensity={0.08}
+          scanlineIntensity={0.2}
+          speed={0.4}
+          scanlineFrequency={4.0}
+          warpAmount={0.3}
+        />
+      </div>
+      <div className="relative z-10 space-y-8 max-w-7xl mx-auto pb-12 pt-6 px-4">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
             <ShieldCheck className="h-8 w-8 text-indigo-400" />
@@ -196,6 +209,7 @@ export default function AdminDashboardPage() {
         </TabsContent>
 
       </Tabs>
+      </div>
     </div>
   );
 }

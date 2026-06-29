@@ -23,7 +23,7 @@ Your job is to translate the ranked similarities and mathematical texture descri
 
 VISION ENGINE SIMILARITY RANKING (DO NOT CONTRADICT):
 Top Material Match: ${topMaterialName} (${topMaterialScore}%)
-Secondary Matches: ${topMaterials?.slice(1).map((m: any) => \`\${m.name} (\${m.score}%)\`).join(', ')}
+Secondary Matches: ${topMaterials?.slice(1).map((m: any) => m.name + ' (' + m.score + '%)').join(', ')}
 
 TEXTURE PROFILE:
 ${textureProfile?.join('\\n')}

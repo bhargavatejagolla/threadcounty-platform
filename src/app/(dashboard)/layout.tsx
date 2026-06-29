@@ -8,15 +8,21 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-full relative bg-zinc-950 selection:bg-indigo-500/30">
-      <Sidebar />
-      <div className="lg:pl-72 flex flex-col min-h-screen">
-        <Topbar />
-        <main className="flex-1 overflow-x-hidden p-6 md:p-8">
+    <div className="h-full relative bg-zinc-950 print:bg-white selection:bg-indigo-500/30">
+      <div className="print:hidden">
+        <Sidebar />
+      </div>
+      <div className="lg:pl-72 print:pl-0 flex flex-col min-h-screen print:min-h-0 print:block">
+        <div className="print:hidden">
+          <Topbar />
+        </div>
+        <main className="flex-1 overflow-x-hidden p-6 md:p-8 print:p-0 print:overflow-visible">
           {children}
         </main>
       </div>
-      <CommandPalette />
+      <div className="print:hidden">
+        <CommandPalette />
+      </div>
     </div>
   );
 }

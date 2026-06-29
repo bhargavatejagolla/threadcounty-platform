@@ -158,7 +158,10 @@ export default function Topbar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="cursor-pointer hover:bg-white/5 focus:bg-white/5 rounded-lg text-zinc-300 hover:text-white transition-colors">
+                <DropdownMenuItem 
+                  onSelect={() => router.push('/profile')}
+                  className="cursor-pointer hover:bg-white/5 focus:bg-white/5 rounded-lg text-zinc-300 hover:text-white transition-colors"
+                >
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>

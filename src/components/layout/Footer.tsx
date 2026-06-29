@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Twitter, Github, Linkedin, Mail } from 'lucide-react';
+import { Search, MessageCircle, Globe, Share2, Mail } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -27,13 +27,13 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4 pt-2">
               <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
-                <Twitter className="h-4 w-4" />
+                <MessageCircle className="h-4 w-4" />
               </a>
               <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
-                <Github className="h-4 w-4" />
+                <Globe className="h-4 w-4" />
               </a>
               <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
-                <Linkedin className="h-4 w-4" />
+                <Share2 className="h-4 w-4" />
               </a>
             </div>
           </div>

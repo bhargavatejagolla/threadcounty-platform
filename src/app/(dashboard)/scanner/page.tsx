@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { extractImageFeatures, calculateMetrics } from '@/lib/cv/extractor';
 import { OpenCVClassifier } from '@/lib/cv/opencv-classifier';
 import { useAppStore } from '@/store/useAppStore';
+import dynamic from 'next/dynamic';
+const Beams = dynamic(() => import('@/components/ui/Beams'), { ssr: false });
+import { toast } from 'sonner';
 
 export default function FabricScannerPage() {
   const router = useRouter();
@@ -22,6 +25,7 @@ export default function FabricScannerPage() {
   const [logs, setLogs] = useState<{time: string, msg: string}[]>([]);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Camera handling
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function FabricScannerPage() {
       addLog('Saving complete inspection record to Vault...');
       
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      const currentUserId = user?.id || 'demo-inspector-id';
 
       const inspectionId = `TC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
       const processingTime = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -105,7 +109,7 @@ export default function FabricScannerPage() {
           .from('inspections')
           .insert({
             inspection_id: inspectionId,
-            user_id: user.id,
+            user_id: currentUserId,
             image_url: targetImage,
             
             // Enterprise Payload
@@ -163,8 +167,9 @@ export default function FabricScannerPage() {
         console.warn("Database error, falling back to local storage:", dbErr);
         addLog("Warning: DB Schema outdated. Saving to Local Storage instead.");
         
+        const localId = `local_${Date.now()}`;
         const localRecord = {
-          id: "local",
+          id: localId,
           inspection_id: inspectionId,
           image_url: targetImage,
           
@@ -208,8 +213,12 @@ export default function FabricScannerPage() {
           analysis_hash: analysisHash,
           created_at: new Date().toISOString()
         };
-        localStorage.setItem('local_inspection', JSON.stringify(localRecord));
-        targetId = "local";
+        const existingStr = localStorage.getItem('local_inspections');
+        const existing = existingStr ? JSON.parse(existingStr) : [];
+        existing.unshift(localRecord);
+        localStorage.setItem('local_inspections', JSON.stringify(existing));
+        
+        targetId = localId;
       }
 
       addLog(`Inspection Complete. Engine Time: ${processingTime}s`);
@@ -251,12 +260,8 @@ export default function FabricScannerPage() {
   const handleFileUpload = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('File too large', { description: 'Please upload an image smaller than 10MB.' });
-        return;
-      }
-      if (!file.type.match(/^image\/(jpeg|png)$/)) {
-        toast.error('Invalid file type', { description: 'Only JPG and PNG formats are supported.' });
+      if (!file.type.startsWith('image/')) {
+        toast.error('Invalid file type', { description: 'Please upload an image file.' });
         return;
       }
       const reader = new FileReader();
@@ -266,12 +271,28 @@ export default function FabricScannerPage() {
         captureAndScan(dataUrl);
       };
       reader.readAsDataURL(file);
+      e.target.value = ''; // Reset input so same file can be uploaded again
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* Header */}
+    <div className="relative min-h-[calc(100vh-80px)]">
+      {/* Background Beams */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+        <Beams
+          beamWidth={4}
+          beamHeight={40}
+          beamNumber={25}
+          lightColor="#6366f1" // Indigo
+          speed={1.5}
+          noiseIntensity={1.5}
+          scale={0.2}
+          rotation={30}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto space-y-8 pt-4 pb-12">
+        {/* Header */}
       {!isScanning && (
         <div className="text-center space-y-4 pt-4">
           <h1 className="text-3xl font-bold tracking-tight text-white">Fabric Scanner</h1>
@@ -358,12 +379,10 @@ export default function FabricScannerPage() {
                 </div>
                 <h3 className="text-lg font-medium text-white mb-2">Drag & Drop Fabric Image</h3>
                 <p className="text-zinc-500 text-sm mb-6">Supports high-res JPG, PNG</p>
-                <input type="file" id="file-upload" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                <label htmlFor="file-upload">
-                  <Button asChild className="bg-white text-zinc-950 hover:bg-zinc-200 cursor-pointer">
-                    <span>Browse Files</span>
-                  </Button>
-                </label>
+                <input type="file" id="file-upload" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
+                <Button onClick={() => fileInputRef.current?.click()} className="bg-white text-zinc-950 hover:bg-zinc-200 cursor-pointer">
+                  Browse Files
+                </Button>
               </div>
             ) : (
               <div className="relative aspect-square md:aspect-video bg-zinc-900">
@@ -459,6 +478,7 @@ export default function FabricScannerPage() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
       </div>
     </div>
   );

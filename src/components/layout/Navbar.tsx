@@ -1,124 +1,93 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Search, Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import PillNav from '@/components/ui/PillNav';
+import { Search } from 'lucide-react';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const pathname = usePathname();
 
   const navLinks = [
-    { name: 'Features', href: '/#features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'About', href: '/about' },
-    { name: 'FAQ', href: '/faq' },
-    { name: 'Contact', href: '/contact' },
+    { label: 'Features', href: '/#features' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'About', href: '/about' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Contact', href: '/contact' },
   ];
 
+  const authButtons = (
+    <div className="flex items-center gap-2">
+      <Link href="/login">
+        <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-white/5 rounded-full px-4">
+          Sign In
+        </Button>
+      </Link>
+      <Link href="/signup">
+        <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-6 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
+          Get Started
+        </Button>
+      </Link>
+    </div>
+  );
+
   return (
-    <header 
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 py-4 shadow-2xl' 
-          : 'bg-transparent py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        
+    <header className="fixed top-6 inset-x-0 z-50 flex justify-center w-full pointer-events-none px-6">
+      <div className="pointer-events-auto flex items-center justify-between w-full max-w-7xl">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group relative z-50">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] transition-shadow">
-            <Search className="h-5 w-5 text-white" />
-          </div>
-          <span className="font-bold text-xl tracking-tight text-white group-hover:text-indigo-100 transition-colors">
+        <Link href="/" className="flex flex-1 items-center gap-2 group relative z-50">
+          <img src="/logo.png" alt="NovaWeave Logo" className="h-8 w-auto rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] transition-shadow" />
+          <span className="font-bold text-xl tracking-tight text-white group-hover:text-indigo-100 transition-colors hidden md:block">
             NovaWeave
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-4">
-          <Link href="/login">
-            <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-white/5">
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/signup">
-            <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-6 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
-              Get Started
-            </Button>
-          </Link>
+        {/* Center Pill Nav */}
+        <div className="hidden md:flex flex-[2] justify-center">
+          <PillNav
+            items={navLinks}
+            activeHref={pathname}
+            baseColor="#18181b"
+            pillColor="#ffffff"
+            hoveredPillTextColor="#000000"
+            pillTextColor="#ffffff"
+            initialLoadAnimation={true}
+          />
         </div>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="md:hidden relative z-50 p-2 text-zinc-400 hover:text-white transition-colors"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-zinc-950/95 backdrop-blur-3xl border-b border-white/10 shadow-2xl md:hidden overflow-hidden"
-          >
-            <div className="flex flex-col px-6 py-8 space-y-6">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-lg font-medium text-zinc-300 hover:text-white transition-colors border-b border-white/5 pb-4"
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <div className="flex flex-col gap-4 pt-4">
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-white hover:bg-white/5">
+        {/* Mobile Pill Nav */}
+        <div className="md:hidden flex-1 flex justify-end">
+          <PillNav
+            items={navLinks}
+            activeHref={pathname}
+            baseColor="#18181b"
+            pillColor="#ffffff"
+            hoveredPillTextColor="#000000"
+            pillTextColor="#ffffff"
+            initialLoadAnimation={true}
+            mobileActions={
+              <div className="flex flex-col gap-3 mt-4">
+                <Link href="/login" className="w-full">
+                  <Button variant="outline" className="w-full rounded-full border-black/20 text-black">
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full h-12 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white">
-                    Get Started Free
+                <Link href="/signup" className="w-full">
+                  <Button className="w-full rounded-full bg-indigo-600 text-white">
+                    Get Started
                   </Button>
                 </Link>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            }
+          />
+        </div>
+
+        {/* Right Auth Buttons */}
+        <div className="hidden md:flex flex-1 justify-end">
+          {authButtons}
+        </div>
+      </div>
     </header>
   );
 }

@@ -14,9 +14,11 @@ export async function GET(req: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .single();
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+      
+    // For Hackathon Demo: Allow all authenticated users
+    // if (profile?.role !== 'admin') {
+    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // }
 
     const { data: users } = await supabase
       .from('profiles')

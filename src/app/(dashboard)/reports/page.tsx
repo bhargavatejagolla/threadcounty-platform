@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, Filter, Calendar, Activity } from 'lucide-react';
 import { InspectionRecord } from '@/types/inspection';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const Waves = dynamic(() => import('@/components/ui/Waves'), { ssr: false });
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -25,16 +28,35 @@ export default function ReportsPage() {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
+      let allRecords = data ? [...(data as InspectionRecord[])] : [];
       
-      if (data) setInspections(data as InspectionRecord[]);
+      const localData = localStorage.getItem('local_inspections');
+      if (localData) {
+        try {
+          const parsedArray = JSON.parse(localData);
+          if (Array.isArray(parsedArray)) {
+            parsedArray.forEach(parsed => {
+              if (!allRecords.find(r => r.id === parsed.id || r.inspection_id === parsed.inspection_id)) {
+                allRecords.unshift(parsed);
+              }
+            });
+          }
+        } catch(e) {}
+      }
+      
+      setInspections(allRecords);
       setLoading(false);
     }
     fetchInspections();
   }, [router]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="relative min-h-[calc(100vh-80px)]">
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <Waves lineColor="rgba(99, 102, 241, 0.25)" backgroundColor="transparent" />
+      </div>
+      <div className="max-w-6xl mx-auto space-y-6 relative z-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <FileText className="w-8 h-8 text-indigo-400" /> NovaWeave Reports
@@ -116,6 +138,7 @@ export default function ReportsPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

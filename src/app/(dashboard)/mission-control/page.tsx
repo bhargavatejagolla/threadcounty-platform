@@ -12,7 +12,9 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 import StarBorder from '@/components/ui/StarBorder';
+import dynamic from 'next/dynamic';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+const Aurora = dynamic(() => import('@/components/ui/Aurora'), { ssr: false });
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -80,17 +82,22 @@ export default function MissionControlPage() {
   }, [router]);
 
   useEffect(() => {
-    if (queryLoading || !dbInspections) return;
+    if (queryLoading) return;
 
-    let allRecords = [...dbInspections];
+    let allRecords = dbInspections ? [...dbInspections] : [];
       
       // Merge local fallback data if it exists (so the user sees it even if DB failed)
-      const localData = localStorage.getItem('local_inspection');
+      const localData = localStorage.getItem('local_inspections');
       if (localData) {
         try {
-          const parsed = JSON.parse(localData);
-          if (!allRecords.find(r => r.id === parsed.id || r.inspection_id === parsed.inspection_id)) {
-            allRecords.unshift(parsed); // Put the local scan at the top
+          const parsedArray = JSON.parse(localData);
+          if (Array.isArray(parsedArray)) {
+            // We reverse so that older ones are pushed first, or just unshift them
+            parsedArray.forEach(parsed => {
+              if (!allRecords.find(r => r.id === parsed.id || r.inspection_id === parsed.inspection_id)) {
+                allRecords.unshift(parsed);
+              }
+            });
           }
         } catch(e) {
           console.error(e);
@@ -174,7 +181,7 @@ export default function MissionControlPage() {
     visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } }
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
@@ -188,9 +195,15 @@ export default function MissionControlPage() {
       initial="hidden"
       animate="visible"
     >
-      {/* Background ambient light */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0"></div>
-      <div className="absolute top-0 right-0 w-[800px] h-[400px] bg-indigo-600/10 blur-[120px] pointer-events-none z-0 rounded-full"></div>
+      {/* Background Aurora */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-60 mix-blend-screen">
+        <Aurora
+          colorStops={["#3b82f6", "#8b5cf6", "#ec4899"]} // AI Startup Colors: Blue, Purple, Pink
+          blend={0.6}
+          amplitude={1.2}
+          speed={0.8}
+        />
+      </div>
 
       {/* Header */}
       <motion.div variants={itemVariants} className="relative z-10 flex flex-col pt-4">

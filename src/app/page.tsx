@@ -4,14 +4,19 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ScanSearch, LineChart, Zap, Sparkles, Database, CheckCircle2 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import Lightfall from '@/components/ui/Lightfall';
+import dynamic from 'next/dynamic';
 import BorderGlow from '@/components/ui/BorderGlow';
 import TrueFocus from '@/components/ui/TrueFocus';
+import StarBorder from '@/components/ui/StarBorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRef } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import SpotlightCard from '@/components/ui/SpotlightCard';
+
+const Lightfall = dynamic(() => import('@/components/ui/Lightfall'), { ssr: false });
+const Ferrofluid = dynamic(() => import('@/components/ui/Ferrofluid'), { ssr: false });
+const Strands = dynamic(() => import('@/components/ui/Strands'), { ssr: false });
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -24,7 +29,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
   visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: "easeOut" } }
 };
@@ -230,24 +235,53 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-40 px-6 relative z-10 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <section className="py-40 px-6 relative z-10 overflow-hidden flex items-center justify-center">
+        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none mix-blend-screen">
+          <Strands
+            colors={["#c084fc", "#818cf8", "#4f46e5", "#06b6d4"]}
+            count={5}
+            speed={0.4}
+            amplitude={1.2}
+            waviness={1.5}
+            thickness={0.8}
+            glow={3.0}
+            taper={2.5}
+            spread={1.5}
+            intensity={0.8}
+            saturation={2}
+            opacity={0.8}
+            scale={1.5}
+            glass={false}
+          />
+        </div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0)_60%)] pointer-events-none z-0"></div>
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto text-center space-y-12 relative z-10 border border-white/10 bg-white/[0.02] backdrop-blur-3xl p-16 md:p-24 rounded-[3rem] shadow-2xl"
+          className="w-full max-w-4xl mx-auto text-center space-y-12 relative z-10 p-8 md:p-16 rounded-[3rem]"
         >
           <div className="space-y-6">
-            <h2 className="text-5xl md:text-7xl font-extrabold tracking-tight">Deploy your QC.</h2>
-            <p className="text-2xl text-zinc-400 font-medium max-w-2xl mx-auto">Join the future of manufacturing intelligence.</p>
+            <h2 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-br from-white via-indigo-100 to-indigo-400 text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+              Deploy your QC.
+            </h2>
+            <p className="text-2xl text-zinc-300 font-medium max-w-2xl mx-auto drop-shadow-md">
+              Join the future of manufacturing intelligence.
+            </p>
           </div>
-          <Link href="/signup" className="inline-block">
-            <Button size="lg" className="h-16 px-12 text-xl rounded-full bg-white text-zinc-950 hover:bg-zinc-200 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_80px_rgba(255,255,255,0.5)] transition-all duration-500 hover:scale-105">
-              Get Started Now
-            </Button>
-          </Link>
+          <div className="flex justify-center mt-8">
+            <Link href="/signup">
+              <StarBorder 
+                as="button" 
+                color="#6366f1" 
+                speed="4s" 
+                className="px-12 py-5 text-xl font-bold bg-white text-zinc-950 hover:bg-zinc-200 transition-colors shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_80px_rgba(255,255,255,0.5)]"
+              >
+                Get Started Now
+              </StarBorder>
+            </Link>
+          </div>
         </motion.div>
       </section>
 
