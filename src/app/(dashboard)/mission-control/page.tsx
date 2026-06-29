@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   ScanSearch, Activity, Database, CheckCircle2, ArrowRight, Sparkles, Cpu, Clock, Layers,
-  TrendingUp, TrendingDown, Target, Zap, MoreVertical, ShieldCheck
+  TrendingUp, TrendingDown, Target, Zap, MoreVertical, ShieldCheck, Server, AlertCircle
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -504,26 +504,45 @@ export default function MissionControlPage() {
           </CardContent>
         </Card>
 
-        {/* CTA Card */}
-        <Card className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border-indigo-500/20 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-          <CardContent className="p-8 h-full flex flex-col justify-center relative z-10">
-            <div className="mb-6">
-              <Sparkles className="h-6 w-6 text-indigo-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">AI Model v2.1 is Here!</h3>
-              <p className="text-sm text-zinc-300 leading-relaxed max-w-[200px]">
-                Better accuracy, faster inference and improved texture metric recognition based on GLCM approximations.
-              </p>
-            </div>
-            <StarBorder as="button" color="#a855f7" speed="4s" className="w-fit text-sm font-semibold transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:scale-105 active:scale-95 border-none p-0">
-              <span className="flex items-center">Explore What's New <ArrowRight className="ml-2 h-4 w-4" /></span>
-            </StarBorder>
-            
-            <div className="absolute -bottom-10 -right-10 opacity-30 group-hover:opacity-60 transition-opacity duration-500 blur-[2px]">
-              <div className="h-40 w-40 border border-indigo-500/30 rounded-xl rotate-12 flex items-center justify-center bg-indigo-500/5">
-                <div className="h-28 w-28 border border-purple-500/30 rounded-xl -rotate-6 bg-purple-500/5 flex items-center justify-center">
-                  <span className="font-black text-6xl text-white/20">AI</span>
+        {/* System Health Center */}
+        <Card className="bg-zinc-950/80 border-white/5 backdrop-blur-xl relative overflow-hidden group flex flex-col">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardHeader className="pb-3 border-b border-white/5 relative z-10">
+            <CardTitle className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
+              <Server className="h-4 w-4 text-emerald-400" /> System Health
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 flex-1 flex flex-col justify-between relative z-10">
+            <div className="space-y-4">
+              {[
+                { label: 'Vision Engine (OpenCV)', status: 'Healthy', delay: '0ms' },
+                { label: 'LLM Node (Groq Llama)', status: 'Healthy', delay: '100ms' },
+                { label: 'Database (Supabase)', status: 'Healthy', delay: '200ms' },
+                { label: 'Feature API', status: 'Healthy', delay: '300ms' },
+              ].map((service, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-zinc-400">{service.label}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400">{service.status}</span>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" style={{ animationDelay: service.delay }}></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-white/5 grid grid-cols-2 gap-4">
+              <div className="bg-zinc-900/50 p-3 rounded-lg border border-white/5">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-1">Global Latency</p>
+                <p className="text-lg font-mono text-emerald-400">32<span className="text-[10px] text-zinc-500 ml-1">ms</span></p>
+              </div>
+              <div className="bg-zinc-900/50 p-3 rounded-lg border border-white/5">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-1">GPU Compute</p>
+                <p className="text-sm font-mono text-emerald-400 flex items-center gap-2 mt-1.5">
+                  <Zap className="h-3.5 w-3.5" /> Online
+                </p>
               </div>
             </div>
           </CardContent>
