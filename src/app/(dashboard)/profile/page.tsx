@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import Loading from '@/components/ui/Loading';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -63,7 +64,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <div className="p-6 max-w-2xl mx-auto space-y-6"><Skeleton className="h-64" /></div>;
+    return <Loading />;
   }
 
   return (

@@ -2,6 +2,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Users, Activity, Settings, ShieldCheck, Database, ArrowUpRight, TrendingUp } from 'lucide-react';
+import Loading from '@/components/ui/Loading';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -36,7 +38,7 @@ export default function AdminAnalyticsPage() {
   }, []);
 
   if (loading) {
-    return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
+    return <Loading />;
   }
 
   if (!stats) return <p>Failed to load analytics.</p>;

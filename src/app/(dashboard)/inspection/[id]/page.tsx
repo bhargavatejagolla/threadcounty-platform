@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InspectionRecord } from '@/types/inspection';
+import Loading from '@/components/ui/Loading';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
 
@@ -83,12 +84,7 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <div className="w-12 h-12 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
-        <p className="text-zinc-500 text-sm font-medium tracking-widest uppercase animate-pulse">Accessing Vault Record...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!inspection) {
