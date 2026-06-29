@@ -9,6 +9,7 @@ import { UploadCloud, Camera as CameraIcon, Layers, Image as ImageIcon, Zap, Cpu
 import { motion, AnimatePresence } from 'framer-motion';
 import { extractImageFeatures, calculateMetrics } from '@/lib/cv/extractor';
 import { OpenCVClassifier } from '@/lib/cv/opencv-classifier';
+import { useAppStore } from '@/store/useAppStore';
 
 export default function FabricScannerPage() {
   const router = useRouter();
@@ -213,6 +214,18 @@ export default function FabricScannerPage() {
 
       addLog(`Inspection Complete. Engine Time: ${processingTime}s`);
       
+      // Phase 1: Fire Global Event & Notifications
+      useAppStore.getState().fireEvent('INSPECTION_COMPLETED', { id: targetId, material, pattern, quality: qualityScore });
+      useAppStore.getState().addActivity({
+        action: 'Scan Completed',
+        details: `${inspectionId} finished in ${processingTime}s (${material})`
+      });
+      useAppStore.getState().addNotification({
+        title: 'Inspection Successful',
+        message: `${inspectionId} processed with ${qualityScore}/100 quality score.`,
+        type: 'success'
+      });
+
       // Route to the new unified Inspection Page using the exact DB ID or local ID
       setTimeout(() => router.push(`/inspection/${targetId}`), 1000);
 

@@ -19,6 +19,8 @@ import {
   LineChart, Line
 } from 'recharts';
 import { InspectionRecord } from '@/types/inspection';
+import { useAppStore } from '@/store/useAppStore';
+import { useInspections } from '@/hooks/useInspections';
 
 const sparklineData1 = [{ v: 20 }, { v: 30 }, { v: 25 }, { v: 45 }, { v: 40 }, { v: 60 }];
 const sparklineData2 = [{ v: 90 }, { v: 92 }, { v: 95 }, { v: 93 }, { v: 98 }, { v: 99.2 }];
@@ -27,6 +29,7 @@ const sparklineData4 = [{ v: 3.5 }, { v: 3.2 }, { v: 2.8 }, { v: 3.0 }, { v: 2.4
 
 export default function MissionControlPage() {
   const router = useRouter();
+  const { activityFeed } = useAppStore();
   const [userFullName, setUserFullName] = useState('Inspector');
   const [greeting, setGreeting] = useState('Welcome back');
   const [loading, setLoading] = useState(true);
@@ -44,8 +47,10 @@ export default function MissionControlPage() {
   const [pieData, setPieData] = useState<any[]>([]);
   const [radarData, setRadarData] = useState<any[]>([]);
 
+  const { data: dbInspections, isLoading: queryLoading, error: queryError } = useInspections();
+  
   useEffect(() => {
-    async function fetchData() {
+    async function initUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
@@ -70,15 +75,14 @@ export default function MissionControlPage() {
       } else if (user.email) {
         setUserFullName(user.email.split('@')[0]);
       }
+    }
+    initUser();
+  }, [router]);
 
-      // Fetch unified inspections from DB
-      const { data: dbInspections } = await supabase
-        .from('inspections')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+  useEffect(() => {
+    if (queryLoading || !dbInspections) return;
 
-      let allRecords = dbInspections ? [...(dbInspections as InspectionRecord[])] : [];
+    let allRecords = [...dbInspections];
       
       // Merge local fallback data if it exists (so the user sees it even if DB failed)
       const localData = localStorage.getItem('local_inspection');
@@ -163,9 +167,7 @@ export default function MissionControlPage() {
         ]);
       }
       setLoading(false);
-    }
-    fetchData();
-  }, [router]);
+  }, [dbInspections, queryLoading]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -374,51 +376,42 @@ export default function MissionControlPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Analyses List (REAL DATA) */}
-        <Card className="bg-zinc-950/80 border-white/5 backdrop-blur-xl flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/5">
-            <CardTitle className="text-sm font-semibold text-white tracking-wide">Recent Analyses</CardTitle>
-            <button onClick={() => router.push('/vault')} className="text-xs font-medium text-zinc-400 hover:text-white flex items-center transition-colors">
+        {/* Live Activity Feed */}
+        <Card className="bg-zinc-950/80 border-white/5 backdrop-blur-xl flex flex-col relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/5 relative z-10">
+            <CardTitle className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </span>
+              Live Activity Feed
+            </CardTitle>
+            <button className="text-xs font-medium text-zinc-400 hover:text-white flex items-center transition-colors">
               View All <ArrowRight className="ml-1 h-3 w-3" />
             </button>
           </CardHeader>
-          <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
-            <div className="divide-y divide-white/5 overflow-y-auto max-h-[340px] px-2 py-2">
-              {inspections.slice(0, 5).map((item) => (
-                <div key={item.id} onClick={() => router.push(`/inspection/${item.id}`)} className="flex items-center justify-between p-3 hover:bg-white/[0.03] rounded-lg transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded overflow-hidden border border-white/10 relative shrink-0">
-                      <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${item.image_url})` }}></div>
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+          <CardContent className="flex-1 p-0 flex flex-col overflow-hidden relative z-10">
+            <div className="divide-y divide-white/5 overflow-y-auto max-h-[340px] px-2 py-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              {activityFeed.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center h-full">
+                  <Activity className="h-8 w-8 text-zinc-600 mb-3" />
+                  <p className="text-sm text-zinc-400">Waiting for activity...</p>
+                  <p className="text-[10px] text-zinc-500 mt-1">Run a scan to see events.</p>
+                </div>
+              ) : (
+                activityFeed.slice(0, 8).map((item) => (
+                  <div key={item.id} className="flex items-start gap-3 p-3 hover:bg-white/[0.03] rounded-lg transition-colors group cursor-default">
+                    <div className="mt-0.5 w-2 h-2 rounded-full bg-zinc-600 group-hover:bg-indigo-500 shadow-[0_0_8px_transparent] group-hover:shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">{item.action}</p>
+                      {item.details && <p className="text-xs text-zinc-400 truncate">{item.details}</p>}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-semibold text-white group-hover:text-indigo-400 transition-colors">{item.inspection_id}</p>
-                      </div>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">Homogeneity {((item.homogeneity || 0) * 100).toFixed(0)}% • Angle {item.orientation || 0}°</p>
+                    <div className="text-[10px] text-zinc-500 whitespace-nowrap">
+                      {formatDistanceToNow(item.timestamp, { addSuffix: true })}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className={`px-2 py-0.5 rounded border text-[10px] font-mono shadow-[0_0_10px_rgba(16,185,129,0.1)] ${item.confidence > 90 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
-                      {item.confidence}%
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[11px] font-medium text-zinc-300">{item.processing_time}s</p>
-                      <p className="text-[9px] text-zinc-600">{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</p>
-                    </div>
-                    <button className="text-zinc-600 hover:text-zinc-300 transition-colors">
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              
-              {inspections.length === 0 && (
-                <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <ScanSearch className="h-8 w-8 text-zinc-600 mb-3" />
-                  <p className="text-sm text-zinc-400">No inspections found in Vault.</p>
-                  <Button variant="link" onClick={() => router.push('/scanner')} className="text-indigo-400 mt-2">Run First Scan</Button>
-                </div>
+                ))
               )}
             </div>
           </CardContent>
