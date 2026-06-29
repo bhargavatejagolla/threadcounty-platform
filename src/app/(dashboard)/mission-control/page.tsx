@@ -12,6 +12,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 import StarBorder from '@/components/ui/StarBorder';
+import SpotlightCard from '@/components/ui/SpotlightCard';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -201,9 +202,9 @@ export default function MissionControlPage() {
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
         
         {/* Card 1 */}
-        <Card className="bg-zinc-950/60 border-white/5 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-5">
+        <SpotlightCard className="group" spotlightColor="rgba(168, 85, 247, 0.15)">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardContent className="p-5 relative z-10">
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
@@ -228,12 +229,12 @@ export default function MissionControlPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </SpotlightCard>
 
         {/* Card 2 */}
-        <Card className="bg-zinc-950/60 border-white/5 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-5">
+        <SpotlightCard className="group" spotlightColor="rgba(59, 130, 246, 0.15)">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardContent className="p-5 relative z-10">
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
@@ -258,12 +259,12 @@ export default function MissionControlPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </SpotlightCard>
 
         {/* Card 3 */}
-        <Card className="bg-zinc-950/60 border-white/5 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-5">
+        <SpotlightCard className="group" spotlightColor="rgba(20, 184, 166, 0.15)">
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardContent className="p-5 relative z-10">
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-10 w-10 rounded-lg bg-teal-500/10 flex items-center justify-center border border-teal-500/20 shadow-[0_0_15px_rgba(20,184,166,0.15)]">
@@ -288,12 +289,12 @@ export default function MissionControlPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </SpotlightCard>
 
         {/* Card 4 */}
-        <Card className="bg-zinc-950/60 border-white/5 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-5">
+        <SpotlightCard className="group" spotlightColor="rgba(236, 72, 153, 0.15)">
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+          <CardContent className="p-5 relative z-10">
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-10 w-10 rounded-lg bg-pink-500/10 flex items-center justify-center border border-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.15)]">
@@ -318,7 +319,7 @@ export default function MissionControlPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </SpotlightCard>
 
       </motion.div>
 
