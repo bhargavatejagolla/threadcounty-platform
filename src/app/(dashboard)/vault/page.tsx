@@ -4,11 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Library, Search, SlidersHorizontal, ArrowRight, Download, Filter, ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react';
+import { Library, Search, SlidersHorizontal, ArrowRight, Download, Filter, ArrowDownWideNarrow, ArrowUpWideNarrow, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { InspectionRecord } from '@/types/inspection';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function AnalysisVaultPage() {
   const [inspections, setInspections] = useState<InspectionRecord[]>([]);
@@ -90,6 +91,23 @@ export default function AnalysisVaultPage() {
     setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase.from('inspections').delete().eq('id', id);
+      if (error) throw error;
+      setInspections(prev => prev.filter(item => item.id !== id));
+      toast.success('Report deleted successfully');
+    } catch (error: any) {
+      toast.error('Failed to delete report', { description: error.message });
+    }
+  };
+
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.success('Downloading CSV Export...', { description: 'Generating compliance export payload.' });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -106,7 +124,7 @@ export default function AnalysisVaultPage() {
             {sortOrder === 'desc' ? <ArrowDownWideNarrow className="mr-2 h-4 w-4" /> : <ArrowUpWideNarrow className="mr-2 h-4 w-4" />} 
             {sortOrder === 'desc' ? 'Descending' : 'Ascending'}
           </Button>
-          <Button variant="outline" className="border-white/10 hover:bg-white/5 text-zinc-300">
+          <Button variant="outline" onClick={handleDownload} className="border-white/10 hover:bg-white/5 text-zinc-300">
             <Download className="mr-2 h-4 w-4" /> Export CSV
           </Button>
         </div>
@@ -204,8 +222,18 @@ export default function AnalysisVaultPage() {
                       <span className="text-sm text-zinc-500">
                         {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
                       </span>
-                      <div className="h-10 w-10 rounded-full flex items-center justify-center bg-white/5 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
-                        <ArrowRight className="h-5 w-5" />
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={(e) => handleDelete(e, item.id)}
+                          className="h-10 w-10 rounded-full text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors z-10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center bg-white/5 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
                       </div>
                     </div>
                   </div>

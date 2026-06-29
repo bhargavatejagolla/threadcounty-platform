@@ -251,6 +251,14 @@ export default function FabricScannerPage() {
   const handleFileUpload = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File too large', { description: 'Please upload an image smaller than 10MB.' });
+        return;
+      }
+      if (!file.type.match(/^image\/(jpeg|png)$/)) {
+        toast.error('Invalid file type', { description: 'Only JPG and PNG formats are supported.' });
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;

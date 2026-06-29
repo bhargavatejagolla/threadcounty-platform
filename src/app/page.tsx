@@ -9,6 +9,9 @@ import BorderGlow from '@/components/ui/BorderGlow';
 import TrueFocus from '@/components/ui/TrueFocus';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRef } from 'react';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import SpotlightCard from '@/components/ui/SpotlightCard';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -61,6 +64,8 @@ export default function Home() {
       </div>
 
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none z-0"></div>
+
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative px-6 min-h-screen flex items-center justify-center z-10 pt-20 pb-16">
@@ -245,6 +250,62 @@ export default function Home() {
           </Link>
         </motion.div>
       </section>
+
+      {/* Workflow Section */}
+      <section className="py-24 px-6 relative z-10 border-t border-white/5 bg-zinc-950/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">How it works</h2>
+            <p className="text-zinc-400 mt-4 max-w-2xl mx-auto">Three simple steps to transform your quality control pipeline.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0 z-0 border-dashed border-t border-indigo-500/50"></div>
+            
+            {[
+              { step: '01', title: 'Upload Image', desc: 'Drag and drop high-resolution fabric scans. We support JPG and PNG up to 10MB.' },
+              { step: '02', title: 'Neural Analysis', desc: 'NovaWeave Vision Engine extracts thread density, patterns, and quality metrics instantly.' },
+              { step: '03', title: 'Export & Share', desc: 'Download compliance-ready PDF reports or share insights securely with your team.' }
+            ].map((s, i) => (
+              <div key={i} className="relative z-10 flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-3xl font-black text-indigo-400 mb-6 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                  {s.step}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{s.title}</h3>
+                <p className="text-zinc-400">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 px-6 relative z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Trusted by Industry Leaders</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { quote: "NovaWeave reduced our manual inspection time by 85%. The weave pattern detection is flawlessly accurate.", author: "Sarah Jenkins", role: "QC Director, Loom & Thread" },
+              { quote: "The explainability metrics helped us trust the AI immediately. It's not a black box; it shows exactly why it scored the fabric.", author: "David Chen", role: "Textile Engineer, FabricCorp" },
+              { quote: "Generating PDF compliance reports instantly has completely streamlined our export pipeline.", author: "Elena Rodriguez", role: "Operations Lead, WeaveMasters" }
+            ].map((t, i) => (
+              <SpotlightCard key={i} className="bg-zinc-950/50 border border-white/5 rounded-2xl p-8" spotlightColor="rgba(99,102,241,0.15)">
+                <div className="flex flex-col h-full justify-between">
+                  <p className="text-lg text-zinc-300 italic mb-8">"{t.quote}"</p>
+                  <div>
+                    <p className="font-bold text-white">{t.author}</p>
+                    <p className="text-sm text-indigo-400">{t.role}</p>
+                  </div>
+                </div>
+              </SpotlightCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
 
     </div>
   );

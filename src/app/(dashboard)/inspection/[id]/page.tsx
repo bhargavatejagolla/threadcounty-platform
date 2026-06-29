@@ -130,10 +130,27 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
         </div>
         
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white transition-all bg-zinc-900/50 backdrop-blur-md">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              import('sonner').then((mod) => {
+                mod.toast.success('Link copied', { description: 'Inspection report link copied to clipboard.' });
+              });
+            }}
+            className="border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white transition-all bg-zinc-900/50 backdrop-blur-md"
+          >
             <Share2 className="h-4 w-4 mr-2" /> Share
           </Button>
-          <Button onClick={() => router.push(`/pdf/${inspection.id}`)} className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/20 transition-all">
+          <Button 
+            onClick={() => {
+              import('sonner').then((mod) => {
+                mod.toast('Generating PDF...', { description: 'Preparing high-resolution compliance report.' });
+              });
+              setTimeout(() => window.print(), 1000);
+            }} 
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/20 transition-all"
+          >
             <Download className="h-4 w-4 mr-2" /> Export PDF
           </Button>
         </div>
