@@ -76,7 +76,7 @@ NovaWeave automatically generates enterprise-ready PDF compliance reports. Each 
 
 ## 🏗️ Architecture
 
-NovaWeave is built for absolute transparency and auditability in industrial environments.
+NovaWeave is built for absolute transparency and auditability in industrial environments. It runs entirely on the edge (Vercel free-tier compatible) without requiring expensive GPU backends.
 
 ```mermaid
 graph TD
@@ -85,8 +85,11 @@ graph TD
     C -->|No| D[Reject with Warning]
     C -->|Yes| E[OpenCV Feature Extractor]
     
-    E -->|LBP, GLCM, Edge Density| F[Heuristic Material Classifier]
-    F -->|Feature Vector| G[(Supabase PostgreSQL)]
+    E -->|LBP, GLCM, Edge Density| F[kNN Feature Space Matcher]
+    F -->|Material & Pattern| G[(Supabase PostgreSQL)]
+    
+    C -.->|Future Expansion| Y[YOLOv8-Nano ONNX]
+    Y -.->|Defect Bounding Boxes| G
     
     F -->|Computed Metrics| H[Insight Engine / LLM]
     H -->|Executive Summary| I[Mission Control & PDF Reports]
