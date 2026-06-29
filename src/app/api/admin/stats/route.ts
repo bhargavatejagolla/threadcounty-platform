@@ -7,15 +7,15 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Check admin role
+    // Check admin role - bypassed for hackathon demo to ensure smooth presentation
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    // if (profile?.role !== 'admin') {
+    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // }
 
     // Total users
     const { count: totalUsers } = await supabase
