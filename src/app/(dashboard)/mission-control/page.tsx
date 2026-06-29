@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
+import StarBorder from '@/components/ui/StarBorder';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -520,9 +521,9 @@ export default function MissionControlPage() {
                 Better accuracy, faster inference and improved texture metric recognition based on GLCM approximations.
               </p>
             </div>
-            <Button className="w-fit bg-white text-zinc-950 hover:bg-zinc-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-              Explore What's New <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <StarBorder as="button" color="#a855f7" speed="4s" className="w-fit text-sm font-semibold transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:scale-105 active:scale-95 border-none p-0">
+              <span className="flex items-center">Explore What's New <ArrowRight className="ml-2 h-4 w-4" /></span>
+            </StarBorder>
             
             <div className="absolute -bottom-10 -right-10 opacity-30 group-hover:opacity-60 transition-opacity duration-500 blur-[2px]">
               <div className="h-40 w-40 border border-indigo-500/30 rounded-xl rotate-12 flex items-center justify-center bg-indigo-500/5">
