@@ -60,5 +60,11 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "5.3.3"
+  },
+  "overrides": {
+    "three": "$three",
+    "postprocessing": {
+      "three": "$three"
+    }
   }
 }
