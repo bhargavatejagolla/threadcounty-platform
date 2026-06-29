@@ -23,7 +23,7 @@ function extendMaterial(BaseMaterial: any, cfg: any) {
   if ('envMapIntensity' in defaults) uniforms.envMapIntensity.value = defaults.envMapIntensity;
 
   Object.entries(cfg.uniforms ?? {}).forEach(([key, u]) => {
-    uniforms[key] = u !== null && typeof u === 'object' && 'value' in (u as any) ? u : { value: u };
+    (uniforms as any)[key] = u !== null && typeof u === 'object' && 'value' in (u as any) ? u : { value: u };
   });
 
   let vert = `${cfg.header}\n${cfg.vertexHeader ?? ''}\n${baseVert}`;
