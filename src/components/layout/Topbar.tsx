@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, User, CheckCircle2, Clock, Trash2, X, Activity } from 'lucide-react';
+import { Bell, User, CheckCircle2, Clock, Trash2, X, Activity, LogOut, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,12 +10,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAppStore } from '@/store/useAppStore';
 import { formatDistanceToNow } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase/client';
 
 export default function Topbar() {
   const { notifications, getUnreadCount, markAllNotificationsRead, markNotificationRead, clearNotifications } = useAppStore();
   const unreadCount = getUnreadCount();
+  const router = useRouter();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-4 sm:gap-x-6 sm:px-6 lg:px-8">
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -113,16 +136,80 @@ export default function Topbar() {
 
           {/* Profile dropdown */}
           <div className="relative">
-            <Button variant="ghost" className="flex items-center p-1.5 gap-2 hover:bg-white/5 rounded-full">
-              <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                <User className="h-4 w-4 text-indigo-300" />
-              </div>
-              <span className="hidden lg:flex lg:items-center">
-                <span className="ml-2 text-sm font-medium leading-6 text-zinc-300" aria-hidden="true">
-                  Quality Inspector
-                </span>
-              </span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center p-1.5 gap-2 hover:bg-white/5 rounded-full outline-none focus:ring-2 focus:ring-indigo-500/50">
+                  <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 overflow-hidden relative group-hover:border-indigo-400 transition-colors">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/40 to-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <User className="h-4 w-4 text-indigo-300 relative z-10" />
+                  </div>
+                  <span className="hidden lg:flex lg:items-center">
+                    <span className="ml-2 text-sm font-medium leading-6 text-zinc-300 group-hover:text-white transition-colors" aria-hidden="true">
+                      Quality Inspector
+                    </span>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-zinc-950/95 backdrop-blur-xl border-white/10 text-white shadow-2xl rounded-xl">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none text-white">Quality Inspector</p>
+                    <p className="text-xs leading-none text-zinc-400">admin@threadcounty.com</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/5 focus:bg-white/5 rounded-lg text-zinc-300 hover:text-white transition-colors">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setShowLogoutDialog(true);
+                  }}
+                  className="cursor-pointer text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 focus:bg-rose-500/10 focus:text-rose-300 rounded-lg transition-colors font-medium"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Premium Logout Confirmation Dialog */}
+            <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+              <AlertDialogContent className="bg-zinc-950 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent pointer-events-none"></div>
+                <AlertDialogHeader className="relative z-10">
+                  <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
+                    <LogOut className="h-5 w-5 text-rose-400" />
+                  </div>
+                  <AlertDialogTitle className="text-xl font-semibold text-white tracking-tight">Disconnect from NovaWeave Engine?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-zinc-400">
+                    Are you sure you want to end your session? Any unsaved local analysis buffers will be cleared from memory.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="relative z-10 mt-6 border-t border-white/5 pt-4">
+                  <AlertDialogCancel disabled={isLoggingOut} className="bg-zinc-900 border-white/10 hover:bg-zinc-800 text-white rounded-xl">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                    disabled={isLoggingOut}
+                    className="bg-rose-500 hover:bg-rose-600 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)] rounded-xl border border-rose-400/50"
+                  >
+                    {isLoggingOut ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Disconnecting...</>
+                    ) : (
+                      "Confirm Disconnect"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>
