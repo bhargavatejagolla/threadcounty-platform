@@ -81,24 +81,39 @@ You must return ONLY a JSON object that perfectly matches this structure:
     `;
 
     if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'dummy-key') {
+      const isHighQuality = qualityScore > 85;
+      const hasDefects = metrics.discontinuity_score > 0.4;
+      
+      const dynamicSummary = isHighQuality 
+        ? `Excellent structural consistency with ${metrics.energy > 0.5 ? 'strong' : 'moderate'} repetitive patterns.`
+        : `Moderate structural consistency. Noticed ${hasDefects ? 'significant' : 'minor'} surface variations.`;
+      
+      const dynamicQuality = metrics.edge_density > 0.08 
+        ? "Lighting and contrast are well-normalized. Edge density reveals clear thread boundaries."
+        : "Image is slightly soft. Contrast variations present, but within acceptable thresholds for analysis.";
+        
+      const dynamicRecommendations = [];
+      if (metrics.entropy > 5.5) dynamicRecommendations.push("Possible texture complexity. Inspect weave consistency.");
+      if (metrics.contrast < 20) dynamicRecommendations.push("Capture image under more uniform lighting for better depth mapping.");
+      if (hasDefects) dynamicRecommendations.push("High anomalies detected. Check for physical defects or stains.");
+      if (dynamicRecommendations.length === 0) dynamicRecommendations.push("Maintain current machine tension settings as structural variance is optimal.");
+      dynamicRecommendations.push("Proceed with standard QA batch verification.");
+
       return NextResponse.json({
-        executive_summary: qualityScore > 90 ? "Excellent structural consistency" : "Good structural consistency",
-        image_quality: "Lighting and contrast are well-normalized for deep texture feature extraction.",
+        executive_summary: dynamicSummary,
+        image_quality: dynamicQuality,
         confidence_reasoning: [
           `Inspection Reliability ${reliability}% based on:`,
           `├── Image Sharpness: ${metrics.edge_density > 0.05 ? 'Optimal' : 'Low'}`,
           `├── Lighting: ${metrics.contrast > 20 ? 'Uniform' : 'Uneven'}`,
-          `└── Noise: Minimal`
+          `└── Noise: ${metrics.texture_variance < 150 ? 'Minimal' : 'Elevated'}`
         ],
-        recommendations: [
-          "Maintain current machine tension settings as structural variance is optimal.",
-          "Proceed with standard QA batch verification."
-        ],
+        recommendations: dynamicRecommendations,
         limitations: [
           "Optical texture analysis cannot detect sub-surface fiber compositions."
         ],
-        inspection_grade: metrics.discontinuity_score > 0.5 ? "C" : "A",
-        risk_level: metrics.discontinuity_score > 0.5 ? "Medium" : "Low"
+        inspection_grade: hasDefects ? "C" : (isHighQuality ? "A" : "B"),
+        risk_level: hasDefects ? "High" : (isHighQuality ? "Low" : "Medium")
       });
     }
 

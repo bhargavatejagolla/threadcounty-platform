@@ -46,10 +46,10 @@ export class OpenCVClassifier implements ClassifierPlugin {
     } else if (features.texture_variance > 150 && features.contrast > 20) {
       material = 'Denim';
       matConf = 89;
-    } else if (features.correlation < 0.5 && features.entropy > 5.5) {
+    } else if (features.correlation < 0.4 && features.entropy > 6.5) { // Stricter Linen
       material = 'Linen';
       matConf = 78;
-    } else if (features.edge_density > 15 && features.texture_variance < 80) {
+    } else if (features.edge_density > 10 || features.texture_variance < 120 || features.entropy < 5.5) { // Broader Cotton
       material = 'Cotton';
       matConf = 91;
     } else {
