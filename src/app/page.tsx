@@ -6,6 +6,7 @@ import { ArrowRight, ScanSearch, LineChart, Zap, Sparkles, Database, CheckCircle
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Lightfall from '@/components/ui/Lightfall';
 import BorderGlow from '@/components/ui/BorderGlow';
+import TrueFocus from '@/components/ui/TrueFocus';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRef } from 'react';
 
@@ -75,11 +76,24 @@ export default function Home() {
             <span className="text-sm font-medium text-zinc-300">Introducing ThreadCounty 2.0</span>
           </motion.div>
 
-          <div className="space-y-4">
+          <div className="space-y-8">
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight drop-shadow-2xl">
               <motion.span variants={itemVariants} className="block text-white">Thread<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">County</span></motion.span>
             </h1>
-            <motion.p variants={itemVariants} className="text-xl md:text-3xl text-zinc-400 max-w-3xl mx-auto font-medium leading-relaxed">
+            
+            <motion.div variants={itemVariants} className="flex justify-center scale-75 md:scale-100 origin-top">
+              <TrueFocus 
+                sentence="True Explainable Machine Vision"
+                manualMode={false}
+                blurAmount={5}
+                borderColor="#818cf8"
+                glowColor="rgba(99, 102, 241, 0.6)"
+                animationDuration={0.6}
+                pauseBetweenAnimations={1.5}
+              />
+            </motion.div>
+
+            <motion.p variants={itemVariants} className="text-xl md:text-3xl text-zinc-400 max-w-3xl mx-auto font-medium leading-relaxed mt-4">
               Automated textile inspection powered by deep learning. Uncover thread density and patterns in milliseconds.
             </motion.p>
           </div>
