@@ -34,8 +34,20 @@
     border-color: rgba(255, 255, 255, 0.08); /* Using raw rgba for smooth borders everywhere */
   }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/30;
+    @apply text-foreground antialiased selection:bg-primary/30;
+    background-color: hsl(var(--background));
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+    background-attachment: fixed;
+    animation: pulseGlow 15s ease-in-out infinite alternate;
   }
+}
+
+@keyframes pulseGlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
 }
 
 @layer utilities {
@@ -43,6 +55,31 @@
     text-wrap: balance;
   }
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)];
+    @apply bg-zinc-950/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)];
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.02) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  /* Global Hover Glow for all Cards */
+  .bg-zinc-950\\/50, .bg-card, .bg-zinc-900\\/50 {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .bg-zinc-950\\/50:hover, .bg-card:hover, .bg-zinc-900\\/50:hover {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), inset 0 0 20px rgba(99, 102, 241, 0.05);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
   }
 }

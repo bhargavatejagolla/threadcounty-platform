@@ -43,29 +43,32 @@ export class OpenCVClassifier implements ClassifierPlugin {
       { name: 'Jacquard', profile: { entropy: 7.0, homogeneity: 0.3, contrast: 40, correlation: 0.3, edge_density: 35, texture_variance: 200 } }
     ];
 
-    // Normalization weights to equate ranges (e.g. contrast is 0-50, homogeneity is 0-1)
+    // Normalization weights to equate ranges, heavily weighting intrinsic material properties
+    // (Homogeneity, Energy, Entropy) over lighting/fold dependent ones (Contrast, Variance)
     const weights = {
-      entropy: 1 / 8.0,
-      homogeneity: 1 / 1.0,
-      energy: 1 / 1.0,
-      contrast: 1 / 50.0,
-      correlation: 1 / 1.0,
-      edge_density: 1 / 40.0,
-      texture_variance: 1 / 250.0
+      entropy: (1 / 8.0) * 2.0,      // Intrinsic complexity
+      homogeneity: (1 / 1.0) * 3.0,  // Very important for smooth vs fuzzy
+      energy: (1 / 1.0) * 2.0,       // Pattern repetition
+      contrast: (1 / 50.0) * 0.5,    // Affected by folds/lighting (down-weighted)
+      correlation: (1 / 1.0) * 1.5,  // Linearity
+      edge_density: (1 / 40.0) * 2.0, // Fuzziness vs smoothness
+      texture_variance: (1 / 250.0) * 0.5 // Affected by folds (down-weighted)
     };
 
-    // Calculate distance in feature space
+    // Calculate squared Euclidean distance in feature space
     const getDistance = (profile: any) => {
-      let dist = 0;
+      let distSq = 0;
       let totalWeights = 0;
       for (const [key, weight] of Object.entries(weights)) {
         if (profile[key] !== undefined && (features as any)[key] !== undefined) {
-          const diff = Math.abs(profile[key] - (features as any)[key]) * weight;
-          dist += diff;
+          // Calculate normalized difference
+          const diff = (profile[key] - (features as any)[key]) * weight;
+          // Square the difference to heavily penalize outliers
+          distSq += diff * diff;
           totalWeights += weight;
         }
       }
-      return dist / totalWeights;
+      return Math.sqrt(distSq) / totalWeights;
     };
 
     // Find best material
