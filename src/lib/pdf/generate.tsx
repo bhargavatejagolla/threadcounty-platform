@@ -36,6 +36,7 @@ const ReportDocument = (data: ReportData) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.title}>ThreadCounty Fabric Analysis Report</Text>
+      {/* eslint-disable-next-line jsx-a11y/alt-text */}
       <Image src={data.imageUrl} style={styles.image} />
       <View style={styles.section}>
         <Text style={styles.label}>Fabric Type: {data.fabricType}</Text>

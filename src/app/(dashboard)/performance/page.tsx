@@ -61,7 +61,7 @@ export default function PerformancePage() {
   }, []);
 
   const avgLatency = inspections.length > 0 
-    ? (inspections.reduce((acc, curr) => acc + (curr.processing_time || curr.latency || 0), 0) / inspections.length).toFixed(2)
+    ? (inspections.reduce((acc, curr) => acc + ((curr as any).processing_time || (curr as any).latency || 0), 0) / inspections.length).toFixed(2)
     : "0.00";
 
   return (
