@@ -249,10 +249,10 @@ const Waves = ({
       ctx.clearRect(0, 0, width, height);
       ctx.beginPath();
       ctx.strokeStyle = configRef.current.lineColor;
-      linesRef.current.forEach(points => {
+      linesRef.current.forEach((points: any[]) => {
         let p1 = moved(points[0], false);
         ctx.moveTo(p1.x, p1.y);
-        points.forEach((p, idx) => {
+        points.forEach((p: any, idx: number) => {
           const isLast = idx === points.length - 1;
           p1 = moved(p, !isLast);
           const p2 = moved(points[idx + 1] || points[points.length - 1], !isLast);
