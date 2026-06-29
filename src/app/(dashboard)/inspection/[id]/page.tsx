@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InspectionRecord } from '@/types/inspection';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -293,22 +295,33 @@ export default function InspectionViewPage({ params }: { params: { id: string } 
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <CardContent className="p-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        {[
-                          { key: 'Homogeneity', val: `${(inspection.feature_vector?.homogeneity * 100 || (inspection.homogeneity || 0) * 100 || 0).toFixed(1)}%`, desc: 'Uniform texture' },
-                          { key: 'Entropy', val: inspection.feature_vector?.entropy || inspection.entropy || 0, desc: 'Moderate complexity' },
-                          { key: 'Energy', val: inspection.feature_vector?.energy || inspection.energy || 0, desc: 'Strong repetitive pattern' },
-                          { key: 'Orientation', val: `${inspection.feature_vector?.orientation || inspection.orientation || 0}°`, desc: 'Dominant gradient' },
-                          { key: 'Contrast', val: inspection.feature_vector?.contrast || inspection.contrast || 0, desc: 'Local variation' },
-                          { key: 'Discontinuity', val: inspection.feature_vector?.discontinuity_score || inspection.discontinuity_score || 0, desc: 'Anomaly detection' },
-                        ].map((stat) => (
-                          <div key={stat.key} className="bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 transition-colors group">
-                            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-2 group-hover:text-indigo-400 transition-colors">{stat.key}</p>
-                            <p className="text-lg font-mono text-zinc-200">{stat.val}</p>
-                            <p className="text-[9px] text-zinc-600 mt-1 uppercase tracking-wider">{stat.desc}</p>
-                          </div>
-                        ))}
-                      </div>
+                      <TooltipProvider delayDuration={100}>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          {[
+                            { key: 'Homogeneity', val: `${(inspection.feature_vector?.homogeneity * 100 || (inspection.homogeneity || 0) * 100 || 0).toFixed(1)}%`, desc: 'Uniform texture', detail: 'Measures how uniform the texture is. Higher values (e.g., Silk ~90%) indicate smooth surfaces, while lower values (e.g., Wool ~20%) indicate fuzzy, chaotic fibers.' },
+                            { key: 'Entropy', val: inspection.feature_vector?.entropy?.toFixed(2) || inspection.entropy?.toFixed(2) || 0, desc: 'Complexity', detail: 'Measures the randomness and complexity of the fiber structure. Cotton is typically 5.5, while Wool is highly chaotic at 7.5.' },
+                            { key: 'Energy', val: inspection.feature_vector?.energy?.toFixed(2) || inspection.energy?.toFixed(2) || 0, desc: 'Repetitive pattern', detail: 'Measures specular reflection and pattern repetition. Leather/Silk have high energy (0.8+), while Fleece has almost none (<0.1).' },
+                            { key: 'Orientation', val: `${inspection.feature_vector?.orientation || inspection.orientation || 0}°`, desc: 'Dominant gradient', detail: 'The dominant angle of the fibers or weave. A strict 90° or 0° usually indicates a synthetic or tightly woven grid like Canvas.' },
+                            { key: 'Contrast', val: inspection.feature_vector?.contrast?.toFixed(1) || inspection.contrast?.toFixed(1) || 0, desc: 'Local variation', detail: 'Intensity contrast between a pixel and its neighbor over the entire image. High contrast implies deep weaves (Linen, Denim).' },
+                            { key: 'Discontinuity', val: inspection.feature_vector?.discontinuity_score?.toFixed(1) || inspection.discontinuity_score?.toFixed(1) || 0, desc: 'Anomaly detection', detail: 'A proprietary NovaWeave metric that detects structural breaks, tears, or piling in the fabric surface.' },
+                          ].map((stat) => (
+                            <Tooltip key={stat.key}>
+                              <TooltipTrigger asChild>
+                                <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 hover:bg-white/[0.02] transition-colors group cursor-help relative">
+                                  <Info className="absolute top-3 right-3 w-3 h-3 text-zinc-600 group-hover:text-indigo-400 transition-colors" />
+                                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-2 group-hover:text-indigo-400 transition-colors">{stat.key}</p>
+                                  <p className="text-lg font-mono text-zinc-200">{stat.val}</p>
+                                  <p className="text-[9px] text-zinc-600 mt-1 uppercase tracking-wider">{stat.desc}</p>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-[250px] bg-zinc-950 border-white/10 text-zinc-300 text-xs p-3 shadow-2xl">
+                                <p className="font-semibold text-white mb-1 border-b border-white/10 pb-1">{stat.key} Analysis</p>
+                                {stat.detail}
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                        </div>
+                      </TooltipProvider>
                       
                       <div className="mt-4 pt-4 border-t border-white/5">
                         <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Enterprise JSON Payload</p>
