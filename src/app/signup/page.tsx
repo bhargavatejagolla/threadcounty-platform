@@ -14,7 +14,7 @@ import Link from 'next/link'
 import { Loader2, Sparkles, ArrowRight, CheckCircle2, ArrowLeft, ScanSearch, Eye, EyeOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
-const GridScan = dynamic(() => import('@/components/ui/GridScan'), { ssr: false })
+const LineWaves = dynamic(() => import('@/components/ui/LineWaves'), { ssr: false })
 
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, 'Name must be at least 2 characters'),
@@ -127,24 +127,22 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden relative selection:bg-white/20">
-      {/* Dynamic WebGL GridScan Background */}
+      {/* Dynamic WebGL LineWaves Background */}
       <div className="fixed inset-0 z-0 opacity-100 pointer-events-auto">
-        <GridScan
-          sensitivity={0.55}
-          lineThickness={1}
-          linesColor="#1e1b4b"
-          gridScale={0.1}
-          scanColor="#818cf8"
-          scanOpacity={0.5}
-          enablePost
-          bloomIntensity={0.8}
-          chromaticAberration={0.002}
-          noiseIntensity={0.02}
-          lineJitter={0.1}
-          scanGlow={1.0}
-          scanSoftness={2}
-          enableWebcam={false}
-          showPreview={false}
+        <LineWaves
+          speed={0.3}
+          innerLineCount={32}
+          outerLineCount={36}
+          warpIntensity={1}
+          rotation={-45}
+          edgeFadeWidth={0}
+          colorCycleSpeed={1}
+          brightness={0.3}
+          color1="#ffffff"
+          color2="#a5b4fc"
+          color3="#4f46e5"
+          enableMouseInteraction
+          mouseInfluence={2}
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#000000_100%)] pointer-events-none"></div>
       </div>
